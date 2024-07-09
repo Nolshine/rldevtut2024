@@ -1,24 +1,27 @@
 #!/usr/bin/env python3
 import tcod
+from typing import TYPE_CHECKING, Optional
 
 from game_globals import *
 from actions import EscapeAction, MovementAction
 from input_handlers import EventHandler
 
+if TYPE_CHECKING:
+    from actions import Action
 
-def main():
+def main() -> None:
 
-    player_x = int(SCREEN_W / 2)
-    player_y = int(SCREEN_H / 2)
+    player_x: int = int(SCREEN_W / 2)
+    player_y: int = int(SCREEN_H / 2)
 
-    tileset = tcod.tileset.load_tilesheet(
+    tileset: tcod.tileset.Tileset = tcod.tileset.load_tilesheet(
         FONT_PATH,
         FONT_COLS,
         FONT_ROWS,
         tcod.tileset.CHARMAP_TCOD,
     )
 
-    event_handler = EventHandler()
+    event_handler: EventHandler = EventHandler()
 
     with tcod.context.new_terminal(
         SCREEN_W,
@@ -28,7 +31,7 @@ def main():
         vsync=WINDOW_VSYNC,
     ) as context:
         
-        root_console = tcod.console.Console(SCREEN_W, SCREEN_H, order="F")
+        root_console: tcod.console.Console = tcod.console.Console(SCREEN_W, SCREEN_H, order="F")
 
         while True:
             root_console.print(player_x, player_y, string="@")
@@ -37,7 +40,7 @@ def main():
             root_console.clear()
 
             for event in tcod.event.wait():
-                action = event_handler.dispatch(event)
+                action: Optional[Action] = event_handler.dispatch(event)
 
                 if action is None:
                     continue

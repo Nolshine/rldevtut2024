@@ -1,12 +1,12 @@
 # deviating from tutorial to organise code/references
 
 # main font
-FONT_PATH = "dejavu10x10_gs_tc.png"
-FONT_COLS = 32
-FONT_ROWS = 8
+FONT_PATH: str = "dejavu10x10_gs_tc.png"
+FONT_COLS: int = 32
+FONT_ROWS:int  = 8
 
 # configuration
-WINDOW_TITLE = "Yet Another Roguelike Tutorial"
-WINDOW_VSYNC = True
-SCREEN_W = 80
-SCREEN_H = 50
+WINDOW_TITLE: str = "Yet Another Roguelike Tutorial"
+WINDOW_VSYNC: bool = True
+SCREEN_W: int = 80
+SCREEN_H: int = 50
