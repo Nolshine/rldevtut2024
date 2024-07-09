@@ -38,6 +38,6 @@ class EventHandler(tcod.event.EventDispatch[Action]):
             action = MovementAction(*movement_keys[key])
         
         elif key == tcod.event.KeySym.ESCAPE:
-            action = EscapeAction
+            action = EscapeAction()
 
         return action
