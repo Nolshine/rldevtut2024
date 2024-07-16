@@ -18,7 +18,7 @@ def main() -> None:
         FONT_PATH,
         FONT_COLS,
         FONT_ROWS,
-        tcod.tileset.CHARMAP_TCOD,
+        tcod.tileset.CHARMAP_CP437,
     )
 
     event_handler: EventHandler = EventHandler()
@@ -29,6 +29,7 @@ def main() -> None:
         tileset=tileset,
         title=WINDOW_TITLE,
         vsync=WINDOW_VSYNC,
+        sdl_window_flags=FLAGS,
     ) as context:
         
         root_console: tcod.console.Console = tcod.console.Console(SCREEN_W, SCREEN_H, order="F")
