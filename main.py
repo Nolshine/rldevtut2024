@@ -7,6 +7,7 @@ import tcod.ecs.entity
 
 
 import colors
+from game_constants import *
 from game_globals import *
 from actions import Move, escape_action
 from components import Position, Graphic
