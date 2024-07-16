@@ -1,8 +1,9 @@
-from typing import Optional
+from typing import Optional, Callable
 
 import tcod.event
+import tcod.ecs
 
-from actions import Action, EscapeAction, MovementAction
+from actions import Move, escape_action
 
 
 
@@ -25,19 +26,19 @@ movement_keys = {
     tcod.event.KeySym.KP_3: (1, 1),
 }
 
-class EventHandler(tcod.event.EventDispatch[Action]):
-    def ev_quit(self, event: tcod.event.Quit) -> Optional[Action]:
+class EventHandler(tcod.event.EventDispatch[Callable[[tcod.ecs.Entity], None]]):
+    def ev_quit(self, event: tcod.event.Quit) -> Optional[Callable[[tcod.ecs.Entity], None]]:
         raise SystemExit()
     
-    def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[Action]:
-        action: Optional[Action] = None # This will be returned if no valid key is presed
+    def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[Callable[[tcod.ecs.Entity], None]]:
+        action: Optional[Callable[[tcod.ecs.Entity], None]] = None # This will be returned if no valid key is presed
 
         key = event.sym
 
         if key in movement_keys:
-            action = MovementAction(*movement_keys[key])
+            action = Move(*movement_keys[key])
         
         elif key == tcod.event.KeySym.ESCAPE:
-            action = EscapeAction()
+            action = escape_action
 
         return action
