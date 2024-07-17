@@ -6,8 +6,7 @@ from typing import TYPE_CHECKING, Callable, Optional
 import constants.colors as colors
 from constants.game_constants import *
 from engine.game_globals import *
-from engine.helpers import *
-from components.components import Position, Graphic
+from engine.helpers import create_actor, render_all_entities
 from constants.tags import IsPlayer
 from engine.input_handlers import EventHandler
 
