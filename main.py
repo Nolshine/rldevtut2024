@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Callable, Optional
 import constants.colors as colors
 from constants.game_constants import *
 from engine.game_globals import *
+from engine.helpers import *
 from components.components import Position, Graphic
 from constants.tags import IsPlayer
 from engine.input_handlers import EventHandler
@@ -22,14 +23,9 @@ def main() -> None:
     root_console = tcod.console.Console(SCREEN_W, SCREEN_H, order="F")
 
     world = tcod.ecs.Registry()
-    player = world[object()]
-    player.components[Position] = Position(int(SCREEN_W/2), int(SCREEN_H/2))
-    player.components[Graphic] = Graphic("@", colors.WHITE)
+    player = create_actor(int(SCREEN_W/2), int(SCREEN_H/2), "@", colors.WHITE, world)
     player.tags.add(IsPlayer)
-
-    npc = world[object()]
-    npc.components[Position] = Position(player.components[Position].x + 2, player.components[Position].y)
-    npc.components[Graphic] = Graphic("?", colors.YELLOW)
+    npc = create_actor(int(SCREEN_W/2) + 2, int(SCREEN_H/2), "?", colors.YELLOW, world)
     
     event_handler = EventHandler()
 
@@ -44,17 +40,7 @@ def main() -> None:
 
         while True:
             root_console.clear()
-            for entity in world.Q.all_of(components=[Position, Graphic]):
-                if IsPlayer in entity.tags:
-                    continue
-                pos = entity.components[Position]
-                if not (0 <= pos.x < root_console.width and 0 <= pos.y < root_console.height):
-                    continue
-                graphic = entity.components[Graphic]
-                root_console.print(pos.x, pos.y, graphic.char, graphic.fg)
-            pos = player.components[Position]
-            graphic = player.components[Graphic]
-            root_console.print(pos.x, pos.y, graphic.char, graphic.fg)
+            render_all_entities(root_console, world, player)
             context.present(root_console)
 
             for event in tcod.event.wait():
