@@ -3,7 +3,7 @@ from typing import Any
 
 import tcod.ecs
 
-from components import Position
+from components.components import Position
 
 class Move:
     def __init__(self, dx: int, dy: int) -> None:

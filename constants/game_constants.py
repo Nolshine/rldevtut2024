@@ -5,7 +5,7 @@ from tcod.context import SDL_WINDOW_FULLSCREEN_DESKTOP
 
 
 # main font
-FONT_PATH = "terminal16x16_gs_ro.png"
+FONT_PATH = "assets/terminal16x16_gs_ro.png"
 FONT_COLS = 16
 FONT_ROWS = 16
 

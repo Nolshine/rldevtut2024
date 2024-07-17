@@ -3,7 +3,7 @@ from typing import Optional, Callable
 import tcod.event
 import tcod.ecs
 
-from actions import Move, escape_action
+from actions.actions import Move, escape_action
 
 
 

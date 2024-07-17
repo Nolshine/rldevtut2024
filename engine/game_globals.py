@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     import tcod.console
     import tcod.ecs
 
-    from input_handlers import EventHandler
+    from engine.input_handlers import EventHandler
 
 
 
