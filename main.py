@@ -3,8 +3,6 @@ import tcod
 import tcod.ecs
 from typing import TYPE_CHECKING, Callable, Optional
 
-import tcod.ecs.entity
-
 import constants.colors as colors
 from constants.game_constants import *
 from engine.game_globals import *
