@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING, Callable, Optional
 
 import constants.colors as colors
 from constants.game_constants import *
-from engine.game_globals import *
-from engine.helpers import create_actor, render_all_entities
 from constants.tags import IsPlayer
-from engine.input_handlers import EventHandler
+from engine.game_globals import *
+from engine.helpers import create_actor
+from engine.states import DefaultState
 
 
 
@@ -25,8 +25,8 @@ def main() -> None:
     player = create_actor(int(SCREEN_W/2), int(SCREEN_H/2), "@", colors.WHITE, world)
     player.tags.add(IsPlayer)
     npc = create_actor(int(SCREEN_W/2) + 2, int(SCREEN_H/2), "?", colors.YELLOW, world)
-    
-    event_handler = EventHandler()
+
+    game_state = DefaultState(world)
 
     with tcod.context.new_terminal(
         SCREEN_W,
@@ -39,15 +39,11 @@ def main() -> None:
 
         while True:
             root_console.clear()
-            render_all_entities(root_console, world, player)
+            game_state.on_draw(root_console)
             context.present(root_console)
 
             for event in tcod.event.wait():
-                action: Optional[Callable[[tcod.ecs.Entity], None]] = event_handler.dispatch(event)
-
-                if action is None:
-                    continue
-                action(player)
+                game_state.on_event(event)
                 
 
 

@@ -6,11 +6,11 @@ if TYPE_CHECKING:
     import tcod.console
     import tcod.ecs
 
-    from engine.input_handlers import EventHandler
+    from engine.states import State
 
 
 
 context: tcod.context.Context
 root_console: tcod.console.Console
-event_handler: EventHandler
+game_state: State
 world: tcod.ecs.Registry

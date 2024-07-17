@@ -26,7 +26,7 @@ movement_keys = {
     tcod.event.KeySym.KP_3: (1, 1),
 }
 
-class EventHandler(tcod.event.EventDispatch[Callable[[tcod.ecs.Entity], None]]):
+class DefaultHandler(tcod.event.EventDispatch[Callable[[tcod.ecs.Entity], None]]):
     def ev_quit(self, event: tcod.event.Quit) -> Optional[Callable[[tcod.ecs.Entity], None]]:
         raise SystemExit()
     
