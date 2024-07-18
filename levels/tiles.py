@@ -26,5 +26,3 @@ TILES.flags.writeable = False
 class TileIndices(IntEnum):
     WALL=0 # First value in list HAS to be set to zero, as default IntEnum numbering starts at 1
     FLOOR=auto()
-
-print(TileIndices.WALL)
