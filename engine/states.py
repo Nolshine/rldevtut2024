@@ -6,7 +6,7 @@ from tcod.ecs import Entity, Registry
 
 from constants.tags import IsPlayer
 from engine.input_handlers import DefaultHandler
-from engine.helpers import render_all_entities
+from engine.helpers import render_all_entities, render_map
 
 
 
@@ -35,4 +35,6 @@ class DefaultState(State):
     
     def on_draw(self, console: Console) -> None:
         (player,) = self.world.Q.all_of(tags=[IsPlayer])
+        map_ = self.world[None].relation_tag["ActiveMap"]
+        render_map(console, self.world, map_)
         render_all_entities(console, self.world, player)

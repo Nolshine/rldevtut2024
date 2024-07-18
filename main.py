@@ -9,6 +9,7 @@ from constants.tags import IsPlayer
 from engine.game_globals import *
 from engine.helpers import create_actor
 from engine.states import DefaultState
+from levels.procgen import generate_dungeon
 
 
 
@@ -25,7 +26,10 @@ def main() -> None:
     player = create_actor(int(SCREEN_W/2), int(SCREEN_H/2), "@", colors.WHITE, world)
     player.tags.add(IsPlayer)
     npc = create_actor(int(SCREEN_W/2) + 2, int(SCREEN_H/2), "?", colors.YELLOW, world)
+    npc.tags.add("Npc")
 
+    map_ = generate_dungeon(world, SCREEN_W, SCREEN_H)
+    world[None].relation_tag["ActiveMap"] = map_
     game_state = DefaultState(world)
 
     with tcod.context.new_terminal(

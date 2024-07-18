@@ -1,13 +1,15 @@
 from __future__ import annotations
 from typing import Tuple
 
+import numpy as np
 import tcod.console
 import tcod.ecs.registry
 import tcod.ecs.entity
 
 from constants.tags import IsPlayer
 from constants.game_constants import SCREEN_W, SCREEN_H
-from components.components import Position, Graphic
+from components.components import Position, Graphic, MapShape, Tiles
+from levels.tiles import TILES
 
 
 
@@ -30,3 +32,8 @@ def create_actor(x: int, y: int, char: str, fg: Tuple[int, int, int], world: tco
     entity.components[Position] = Position(x, y)
     entity.components[Graphic] = Graphic(char, fg)
     return entity
+
+def render_map(console: tcod.console.Console, world: tcod.ecs.Registry, map_: tcod.ecs.Entity) -> None:
+    tile_indices = map_.components[Tiles]
+    shape = map_.components[MapShape]
+    console.rgb[0:shape.width, 0:shape.height] = TILES["graphic"][map_.components[Tiles]]

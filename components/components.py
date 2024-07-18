@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from typing import Tuple
+from typing import Tuple, Final
+
+import numpy as np
+from numpy.typing import NDArray
 
 
 
@@ -22,3 +25,10 @@ class Graphic:
     def __init__(self, char: str, fg: Tuple[int, int, int]):
         self.char = char
         self.fg = fg
+
+class MapShape:
+    def __init__(self, width: int, height: int) -> None:
+        self.width = width
+        self.height = height
+
+Tiles: Final = ("Tiles", NDArray[np.int8])
