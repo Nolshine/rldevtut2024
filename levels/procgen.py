@@ -8,7 +8,7 @@ import tcod.ecs
 
 from components.components import Tiles, Position, MapShape
 from levels.tiles import TileIndices
-from constants.tags import IsPlayer
+from constants.tags import IsPlayer, InMap
 
 
 
@@ -52,7 +52,9 @@ def generate_dungeon(world: tcod.ecs.Registry, map_width: int, map_height: int) 
     (player,) = world.Q.all_of(tags=[IsPlayer])
     (npc,) = world.Q.all_of(tags=["Npc"])
     player.components[Position] = Position(*room_1.center)
+    player.relation_tag[InMap] = map_
     npc.components[Position] = Position(*room_2.center)
+    npc.relation_tag[InMap] = map_
 
     return map_
 

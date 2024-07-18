@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Callable, Optional
 
 import constants.colors as colors
 from constants.game_constants import *
-from constants.tags import IsPlayer
+from constants.tags import IsPlayer, ActiveMap, InMap
 from engine.game_globals import *
 from engine.helpers import create_actor
 from engine.states import DefaultState
@@ -29,7 +29,7 @@ def main() -> None:
     npc.tags.add("Npc")
 
     map_ = generate_dungeon(world, SCREEN_W, SCREEN_H)
-    world[None].relation_tag["ActiveMap"] = map_
+    world[None].relation_tag[ActiveMap] = map_
     game_state = DefaultState(world)
 
     with tcod.context.new_terminal(
