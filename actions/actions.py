@@ -3,7 +3,11 @@ from typing import Any
 
 import tcod.ecs
 
+from constants.game_constants import SCREEN_W, SCREEN_H
+from constants.map_constants import *
+from constants.tags import ActiveMap
 from components.components import Position
+from levels.procgen import generate_dungeon
 
 class Move:
     def __init__(self, dx: int, dy: int) -> None:
@@ -15,3 +19,15 @@ class Move:
 
 def escape_action(entity: tcod.ecs.Entity) -> None:
     raise SystemExit()
+
+def regenenerate_map(entity: tcod.ecs.Entity) -> None:
+    r = entity.registry
+    map_ = generate_dungeon(
+        r,
+        SCREEN_W,
+        SCREEN_H,
+        ROOM_MAX_SIZE,
+        ROOM_MIN_SIZE,
+        MAX_ROOMS,
+    )
+    r[None].relation_tag[ActiveMap] = map_

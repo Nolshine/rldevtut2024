@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Callable, Optional
 
 import constants.colors as colors
 from constants.game_constants import *
+from constants.map_constants import *
 from constants.tags import IsPlayer, ActiveMap, InMap
 from engine.game_globals import *
 from engine.helpers import create_actor
@@ -28,7 +29,14 @@ def main() -> None:
     npc = create_actor(int(SCREEN_W/2) + 2, int(SCREEN_H/2), "?", colors.YELLOW, world)
     npc.tags.add("Npc")
 
-    map_ = generate_dungeon(world, SCREEN_W, SCREEN_H)
+    map_ = generate_dungeon(
+        world,
+        SCREEN_W,
+        SCREEN_H,
+        ROOM_MAX_SIZE,
+        ROOM_MIN_SIZE,
+        MAX_ROOMS,
+    )
     world[None].relation_tag[ActiveMap] = map_
     game_state = DefaultState(world)
 

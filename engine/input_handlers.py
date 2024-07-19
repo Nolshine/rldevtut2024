@@ -3,7 +3,7 @@ from typing import Optional, Callable
 import tcod.event
 import tcod.ecs
 
-from actions.actions import Move, escape_action
+from actions.actions import Move, escape_action, regenenerate_map
 
 
 
@@ -40,5 +40,8 @@ class DefaultHandler(tcod.event.EventDispatch[Callable[[tcod.ecs.Entity], None]]
         
         elif key == tcod.event.KeySym.ESCAPE:
             action = escape_action
+
+        elif key == tcod.event.KeySym.F1: # TODO: Remove when finished with testing builds
+            action = regenenerate_map
 
         return action
