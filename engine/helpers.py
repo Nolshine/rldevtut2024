@@ -9,7 +9,7 @@ import tcod.ecs.entity
 from constants.tags import IsPlayer
 from constants.game_constants import SCREEN_W, SCREEN_H
 from components.components import Position, Graphic, MapShape, Tiles
-from levels.tiles import TILES
+from dungeon.tiles import TILES
 
 
 

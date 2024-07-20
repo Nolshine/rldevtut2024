@@ -7,7 +7,7 @@ import numpy as np
 import tcod.ecs
 
 from components.components import Tiles, Position, MapShape
-from levels.tiles import TileIndices
+from dungeon.tiles import TileIndices
 from constants.tags import IsPlayer, InMap
 
 

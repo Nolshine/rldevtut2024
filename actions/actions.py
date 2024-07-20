@@ -7,7 +7,7 @@ from constants.game_constants import SCREEN_W, SCREEN_H
 from constants.map_constants import *
 from constants.tags import ActiveMap
 from components.components import Position
-from levels.procgen import generate_dungeon
+from dungeon.procgen import generate_dungeon
 
 class Move:
     def __init__(self, dx: int, dy: int) -> None:

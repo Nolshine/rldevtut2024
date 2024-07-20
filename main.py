@@ -10,7 +10,7 @@ from constants.tags import IsPlayer, ActiveMap, InMap
 from engine.game_globals import *
 from engine.helpers import create_actor
 from engine.states import DefaultState
-from levels.procgen import generate_dungeon
+from dungeon.procgen import generate_dungeon
 
 
 
