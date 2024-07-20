@@ -10,7 +10,7 @@ from constants.tags import IsPlayer, ActiveMap, InMap
 from engine.game_globals import *
 from engine.helpers import create_actor
 from engine.states import DefaultState
-from dungeon.procgen import generate_dungeon
+from dungeon.procgen import generate_caves
 
 
 
@@ -29,7 +29,7 @@ def main() -> None:
     npc = create_actor(int(SCREEN_W/2) + 2, int(SCREEN_H/2), "?", colors.YELLOW, world)
     npc.tags.add("Npc")
 
-    map_ = generate_dungeon(
+    map_ = generate_caves(
         world,
         SCREEN_W,
         SCREEN_H,
