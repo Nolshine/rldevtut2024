@@ -4,6 +4,7 @@ import random
 from typing import Iterator, List
 
 import numpy as np
+from numpy.typing import NDArray
 import tcod.ecs
 
 from components.components import Tiles, Position, MapShape
@@ -41,6 +42,44 @@ class RectangularRoom:
             and self.y1 <= other.y2
             and self.y2 >= other.y1
         )
+    
+def flood_fill(map_tiles: NDArray[np.int8], start: tuple[int, int]) -> List[tuple[int, int]]:
+    offsets: list[tuple[int, int]] = [(-1, 0), (0, -1), (1, 0), (0, 1)]
+    shape: tuple[int, ...] = map_tiles.shape
+
+    orphan_tiles: List[tuple[int, int]] = []
+    for x in range(shape[0]):
+        for y in range(shape[1]):
+            orphan_tiles.append((x, y))
+
+    tiles: List[tuple[int, int]] = [] # the stack
+
+    tiles.append(start)
+
+    while (len(tiles) > 0):
+        cur_tile: tuple[int, int] = tiles.pop()
+
+        if cur_tile not in orphan_tiles:
+            continue
+
+        orphan_tiles.remove(cur_tile)
+        cur_tile_index = map_tiles[*cur_tile]
+
+        if cur_tile_index == TileIndices.WALL:
+            continue
+
+        for offset in offsets:
+            x, y = cur_tile[0] + offset[0], cur_tile[1] + offset[1]
+            if not ((0 <= x < shape[0]) and (0 <= y < shape[1])):
+                continue
+            tiles.append((x, y))
+
+        # make sure no walls are left in the orphan list
+        for tile_coord in orphan_tiles:
+            if map_tiles[*tile_coord] == TileIndices.WALL:
+                orphan_tiles.remove(tile_coord)
+    
+    return orphan_tiles
 
 def generate_dungeon(
         world: tcod.ecs.Registry,
@@ -122,11 +161,33 @@ def generate_caves(
     for i in range(CA_SECOND_PASSES):
         map_tiles = cave_second_ca(map_tiles, shape)
 
+    (player,) = world.Q.all_of(tags=[IsPlayer])
+    orphaned = flood_fill(map_tiles, player.components[Position].raw)
+
+    while len(orphaned) > 0:
+        tile = random.choice(orphaned)
+        for x, y in tunnel_between(tile, player.components[Position].raw):
+            neighbour_offsets = [
+                (-1, -1),
+                (-1, 0),
+                (-1, 1),
+                (0, -1),
+                (0, 1),
+                (1, -1),
+                (1, 0),
+                (1, 1),
+            ]
+            map_tiles[x, y] = TileIndices.FLOOR
+            for offset in neighbour_offsets:
+                if random.random() < 0.5:
+                    map_tiles[x + offset[0], y+offset[1]] = TileIndices.FLOOR
+        orphaned = flood_fill(map_tiles, player.components[Position].raw)
+
     map_.components[Tiles] = map_tiles
 
     return map_
 
-def cave_first_ca(tiles_input: np.ndarray[np.int8], shape: MapShape):
+def cave_first_ca(tiles_input: NDArray[np.int8], shape: MapShape) -> NDArray[np.int8]:
     tiles_output = np.copy(tiles_input)
     for x in range(shape.width):
         for y in range(shape.height):
@@ -134,7 +195,7 @@ def cave_first_ca(tiles_input: np.ndarray[np.int8], shape: MapShape):
                 tiles_output[x, y] = TileIndices.WALL
     return tiles_output
 
-def cave_second_ca(tiles_input: np.ndarray[np.int8], shape: MapShape):
+def cave_second_ca(tiles_input: NDArray[np.int8], shape: MapShape) -> NDArray[np.int8]:
     tiles_output = np.copy(tiles_input)
     for x in range(shape.width):
         for y in range(shape.height):
@@ -143,7 +204,7 @@ def cave_second_ca(tiles_input: np.ndarray[np.int8], shape: MapShape):
     return tiles_output
 
 def check_neighbors(
-        tiles: np.ndarray[np.int8],
+        tiles: NDArray[np.int8],
         point: tuple[int, int], 
         shape: MapShape,
         tile_type: TileIndices,

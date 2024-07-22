@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Tuple, Final
+from typing import Final
 
 import numpy as np
 from numpy.typing import NDArray
@@ -13,16 +13,20 @@ class Position:
         self.x = x
         self.y = y
 
-    def __add__(self, other: Position | Tuple[int, int]) -> Position:
+    def __add__(self, other: Position | tuple[int, int]) -> Position:
         """Return a new position, offset by 'other'."""
         if isinstance(other, tuple):
             return self.__class__(self.x + other[0], self.y + other[1])
         else: # Stops mypy from yelling :P
             return self.__class__(self.x + other.x, self.y + other.y)
+        
+    @property
+    def raw(self) -> tuple[int, int]:
+        return (self.x, self.y)
     
 class Graphic:
     """An entity's visual representation."""
-    def __init__(self, char: str, fg: Tuple[int, int, int]):
+    def __init__(self, char: str, fg: tuple[int, int, int]):
         self.char = char
         self.fg = fg
 
