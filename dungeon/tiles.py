@@ -13,6 +13,7 @@ TILES = np.asarray(
     [
         ("wall", (ord("#"), colors.DARK_FADED_BROWN, colors.BLACK), 0, False),
         ("floor", (ord("."), colors.DARK_GREY, colors.BLACK), 1, True),
+        ("DEBUG", (ord("!"), colors.RED, colors.BLACK), 1, True),
     ],
     dtype=[
         ("name", str),

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import time
+from random import Random
 
 import tcod
 import tcod.ecs
@@ -23,9 +24,14 @@ def main() -> None:
         FONT_ROWS,
         tcod.tileset.CHARMAP_CP437,
     )
+    seed = int(time.time())
+    print(f"Seed: {seed}")
     root_console = tcod.console.Console(SCREEN_W, SCREEN_H, order="F")
 
     world = tcod.ecs.Registry()
+    rng = Random()
+    rng.seed(seed)
+    world[None].components["Random"] = rng
     player = create_actor(int(SCREEN_W/2), int(SCREEN_H/2), "@", colors.WHITE, world)
     player.tags.add(IsPlayer)
     npc = create_actor(int(SCREEN_W/2) + 2, int(SCREEN_H/2), "?", colors.YELLOW, world)
@@ -51,10 +57,6 @@ def main() -> None:
         sdl_window_flags=FLAGS,
     ) as context:
         
-        show = True
-        hide_time: float = time.time() + 1
-        show_time: float
-
         while True:
             root_console.clear()
             game_state.on_draw(root_console)

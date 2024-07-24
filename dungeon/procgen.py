@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import random
+import time
 from typing import Iterator, List
 
 import numpy as np
+import scipy.ndimage as ndi
 from numpy.typing import NDArray
+import tcod
 import tcod.ecs
 
 from components.components import Tiles, Position, MapShape
@@ -89,6 +92,7 @@ def generate_dungeon(
         room_min_size: int,
         max_rooms: int,
 ) -> tcod.ecs.Entity:
+    rng = world[None].components["Random"]
     (player,) = world.Q.all_of(tags=[IsPlayer])
     (npc,) = world.Q.all_of(tags=["Npc"]) # TODO: remove outside of testing builds
 
@@ -97,15 +101,16 @@ def generate_dungeon(
     map_.components[Tiles] = np.zeros((map_width, map_height), dtype=np.int8)
     map_.components[MapShape] = shape
     map_tiles = map_.components[Tiles]
+    map_
 
     rooms: List[RectangularRoom] = []
 
     for r in range(max_rooms):
-        room_width = random.randint(room_min_size, room_max_size)
-        room_height = random.randint(room_min_size, room_max_size)
+        room_width = rng.randint(room_min_size, room_max_size)
+        room_height = rng.randint(room_min_size, room_max_size)
 
-        x = random.randint(0, shape.width - room_width - 1)
-        y = random.randint(0, shape.height - room_height - 1)
+        x = rng.randint(0, shape.width - room_width - 1)
+        y = rng.randint(0, shape.height - room_height - 1)
 
         new_room = RectangularRoom(x, y, room_width, room_height)
 
@@ -121,7 +126,7 @@ def generate_dungeon(
             player.relation_tag[InMap] = map_
         else:
             # All other rooms after the first
-            for x, y in tunnel_between(rooms[-1].center, new_room.center):
+            for x, y in tunnel_between(world, rooms[-1].center, new_room.center):
                 map_tiles[x, y] = TileIndices.FLOOR
         
         rooms.append(new_room)
@@ -139,7 +144,10 @@ def generate_caves(
         room_max_size: int,
         room_min_size: int,
         max_rooms: int,
+        seed: int | None = None,
 ) -> tcod.ecs.Entity:
+    print("Generating caves...")
+    rng = world[None].components["Random"]
     map_ = generate_dungeon(world, map_width, map_height, room_max_size, room_min_size, max_rooms)
     shape = map_.components[MapShape]
     map_tiles = map_.components[Tiles]
@@ -150,7 +158,7 @@ def generate_caves(
         for y in range(shape.height):
             if x == 0 or y == 0 or x == shape.width -1 or y == shape.height-1:
                 continue
-            if (map_tiles[x, y] == TileIndices.WALL) and random.random() < 0.55:
+            if (map_tiles[x, y] == TileIndices.WALL) and rng.random() < 0.55:
                 map_tiles2[x, y] = TileIndices.FLOOR
     map_tiles = map_tiles2
 
@@ -161,27 +169,30 @@ def generate_caves(
     for i in range(CA_SECOND_PASSES):
         map_tiles = cave_second_ca(map_tiles, shape)
 
-    (player,) = world.Q.all_of(tags=[IsPlayer])
-    orphaned = flood_fill(map_tiles, player.components[Position].raw)
+    s = [
+        [1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1],
+    ]
 
-    while len(orphaned) > 0:
-        tile = random.choice(orphaned)
-        for x, y in tunnel_between(tile, player.components[Position].raw):
-            neighbour_offsets = [
-                (-1, -1),
-                (-1, 0),
-                (-1, 1),
-                (0, -1),
-                (0, 1),
-                (1, -1),
-                (1, 0),
-                (1, 1),
-            ]
-            map_tiles[x, y] = TileIndices.FLOOR
-            for offset in neighbour_offsets:
-                if random.random() < 0.5:
-                    map_tiles[x + offset[0], y+offset[1]] = TileIndices.FLOOR
-        orphaned = flood_fill(map_tiles, player.components[Position].raw)
+    labelled, num_features = ndi.label(map_tiles, structure=s)
+    regions: list[tuple[slice, slice, None]] = ndi.find_objects(labelled)
+    assert len(regions) == num_features
+
+    for region_slices in regions:
+        region = map_tiles[region_slices[0], region_slices[1]]
+        region_width, region_height = (len(region), len(region[0]))
+        print(f"Checking region sized: {region_width}x{region_height}") #TODO: remove when done debugging caves
+        if (region_width < room_min_size) or (region_height < room_min_size):
+            print("Marking small region") #TODO: remove when done debugging caves
+            map_tiles[region_slices[0], region_slices[1]] = np.where(
+                map_tiles[region_slices[0], region_slices[1]] == TileIndices.FLOOR,
+                2,
+                map_tiles[region_slices[0], region_slices[1]]
+            )
+
+
+
 
     map_.components[Tiles] = map_tiles
 
@@ -226,13 +237,15 @@ def check_neighbors(
     return count
 
 def tunnel_between(
+        world: tcod.ecs.Registry,
         start: tuple[int, int],
         end: tuple[int, int],
 ) -> Iterator[tuple[int, int]]:
     """Return an L-shaped tunnel between these two points."""
+    rng = world[None].components["Random"]
     x1, y1 = start
     x2, y2 = end
-    if random.random()  < 0.5:
+    if rng.random()  < 0.5:
         corner_x, corner_y = x2, y1
     else:
         corner_x, corner_y = x1, y2
