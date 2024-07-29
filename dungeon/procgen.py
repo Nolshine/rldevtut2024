@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import random
-import time
+from itertools import pairwise
 from typing import Iterator, List
 
 import numpy as np
@@ -14,6 +13,8 @@ from components.components import Tiles, Position, MapShape
 from dungeon.tiles import TileIndices
 from constants.map_constants import CA_FIRST_PASSES, CA_SECOND_PASSES, CA_MIN_WALLS, CA_MIN_FLOORS
 from constants.tags import IsPlayer, InMap
+
+import random
 
 
 
@@ -94,7 +95,7 @@ def generate_dungeon(
 ) -> tcod.ecs.Entity:
     rng = world[None].components["Random"]
     (player,) = world.Q.all_of(tags=[IsPlayer])
-    (npc,) = world.Q.all_of(tags=["Npc"]) # TODO: remove outside of testing builds
+    (npc,) = world.Q.all_of(tags=["Npc"]) # TODO: remove when implementing non-player actors
 
     map_ = world[object()]
     shape = MapShape(map_width, map_height)
@@ -175,23 +176,40 @@ def generate_caves(
         [1, 1, 1],
     ]
 
+    # create a list of slices that represent unconnected regions
     labelled, num_features = ndi.label(map_tiles, structure=s)
     regions: list[tuple[slice, slice, None]] = ndi.find_objects(labelled)
+    isolated: list[tuple[slice, slice, None]] = []
     assert len(regions) == num_features
+
 
     for region_slices in regions:
         region = map_tiles[region_slices[0], region_slices[1]]
         region_width, region_height = (len(region), len(region[0]))
-        print(f"Checking region sized: {region_width}x{region_height}") #TODO: remove when done debugging caves
         if (region_width < room_min_size) or (region_height < room_min_size):
-            print("Marking small region") #TODO: remove when done debugging caves
+            # wall in regions that are too small
             map_tiles[region_slices[0], region_slices[1]] = np.where(
                 map_tiles[region_slices[0], region_slices[1]] == TileIndices.FLOOR,
-                2,
+                TileIndices.WALL,
                 map_tiles[region_slices[0], region_slices[1]]
             )
+        else:
+            # add big regions to a list
+            isolated.append(region_slices)
 
-
+    # connect isolated regions
+    for r1, r2 in pairwise(isolated):
+        print("connecting regions:") # TODO: Remove when done testing
+        print(f"{r1} / {r2}") # Remove when done testing
+        good = False
+        while not good:
+            good = True
+            x1, y1 = rng.randint(r1[0].start, r1[0].stop - 1), rng.randint(r1[1].start, r1[1].stop - 1)
+            x2, y2 = rng.randint(r2[0].start, r2[0].stop - 1), rng.randint(r2[1].start, r2[1].stop - 1)
+            if map_tiles[x1, y1] == TileIndices.WALL or map_tiles[x2, y2] == TileIndices.WALL:
+                good = False
+        for x, y in tunnel_between(world, (x1, y1), (x2, y2)): # TODO: more organic tunneling function
+            map_tiles[x, y] = TileIndices.FLOOR
 
 
     map_.components[Tiles] = map_tiles

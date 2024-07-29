@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from random import Random
 import time
 from typing import Any
 
@@ -29,9 +28,9 @@ def escape_action(entity: tcod.ecs.Entity) -> None:
     raise SystemExit()
 
 def regenenerate_map(entity: tcod.ecs.Entity) -> None: # TODO: remove when not in testing builds
+    r = entity.registry
     new_seed = int(time.time())
     print(f"Seed: {new_seed}")
-    r = entity.registry
     r[None].components["Random"].seed(new_seed)
     map_ = generate_caves(
         r,
