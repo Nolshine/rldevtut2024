@@ -15,3 +15,6 @@ WINDOW_TITLE = "Yet Another Roguelike Tutorial"
 WINDOW_VSYNC = True
 SCREEN_W = 80
 SCREEN_H = 50
+
+# player tuning - player stats that can not change go here
+PLAYER_FOV_RADIUS = 10

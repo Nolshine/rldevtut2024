@@ -7,22 +7,25 @@ import tcod.ecs
 
 from constants.game_constants import SCREEN_W, SCREEN_H
 from constants.map_constants import *
-from constants.tags import ActiveMap
+from constants.tags import ActiveMap, IsPlayer
 from components.components import Position, Tiles
 from dungeon.procgen import generate_caves
 from dungeon.tiles import TileIndices
+from engine.actor_helpers import update_fov
 
 class Move:
     def __init__(self, dx: int, dy: int) -> None:
         self.dx = dx
         self.dy = dy
 
-    def __call__(self, e: tcod.ecs.Entity) -> None:
-        pos = e.components[Position]
+    def __call__(self, entity: tcod.ecs.Entity) -> None:
+        pos = entity.components[Position]
         target = Position(pos.x + self.dx, pos.y + self.dy)
-        map_tiles = e.registry[None].relation_tag[ActiveMap].components[Tiles]
+        map_tiles = entity.registry[None].relation_tag[ActiveMap].components[Tiles]
         if not map_tiles[target.x, target.y] == TileIndices.WALL:
-            e.components[Position] = target
+            entity.components[Position] = target
+        assert IsPlayer in entity.tags
+        update_fov(entity)
 
 def escape_action(entity: tcod.ecs.Entity) -> None:
     raise SystemExit()
@@ -41,3 +44,4 @@ def regenenerate_map(entity: tcod.ecs.Entity) -> None: # TODO: remove when not i
         MAX_ROOMS,
     )
     r[None].relation_tag[ActiveMap] = map_
+    update_fov(entity)

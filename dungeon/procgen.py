@@ -9,7 +9,7 @@ from numpy.typing import NDArray
 import tcod
 import tcod.ecs
 
-from components.components import Tiles, Position, MapShape
+from components.components import Tiles, VisibleTiles, ExploredTiles, Position, MapShape
 from dungeon.tiles import TileIndices
 from constants.map_constants import CA_FIRST_PASSES, CA_SECOND_PASSES, CA_MIN_WALLS, CA_MIN_FLOORS
 from constants.tags import IsPlayer, InMap
@@ -99,10 +99,11 @@ def generate_dungeon(
 
     map_ = world[object()]
     shape = MapShape(map_width, map_height)
-    map_.components[Tiles] = np.zeros((map_width, map_height), dtype=np.int8)
+    map_.components[Tiles] = np.full(shape.raw, TileIndices.WALL, dtype=np.int8)
+    map_.components[VisibleTiles] = np.zeros(shape.raw, dtype=np.bool)
+    map_.components[ExploredTiles] = np.zeros(shape.raw, dtype=np.int8)
     map_.components[MapShape] = shape
     map_tiles = map_.components[Tiles]
-    map_
 
     rooms: List[RectangularRoom] = []
 

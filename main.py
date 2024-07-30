@@ -11,7 +11,7 @@ from constants.game_constants import *
 from constants.map_constants import *
 from constants.tags import IsPlayer, ActiveMap
 from engine.game_globals import *
-from engine.helpers import create_actor
+from engine.actor_helpers import create_actor, update_fov
 from engine.states import DefaultState
 from dungeon.procgen import generate_caves
 
@@ -47,6 +47,7 @@ def main() -> None:
     )
     world[None].relation_tag[ActiveMap] = map_
     game_state = DefaultState(world)
+    update_fov(player)
 
     with tcod.context.new_terminal(
         SCREEN_W,
