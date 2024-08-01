@@ -5,7 +5,7 @@ import tcod.console
 import tcod.ecs.registry
 import tcod.ecs.entity
 
-from constants.tags import IsPlayer, InMap
+from constants.tags import IsPlayer, InMap, ActiveMap
 from constants.game_constants import SCREEN_W, SCREEN_H
 from components.components import Position, Graphic, MapShape, Tiles, VisibleTiles, ExploredTiles
 from dungeon.tiles import TILES
@@ -13,7 +13,7 @@ from dungeon.tiles import TILES
 
 
 def render_all_entities(root_console: tcod.console.Console, world: tcod.ecs.Registry, player: tcod.ecs.Entity) -> None:
-    for entity in world.Q.all_of(components=[Position, Graphic]):
+    for entity in world.Q.all_of(components=[Position, Graphic], relations=[(InMap, world[None].relation_tag[ActiveMap])]):
         if IsPlayer in entity.tags:
             continue
         render_entity(root_console, entity)
