@@ -11,8 +11,8 @@ import constants.colors as colors
 
 TILES = np.asarray(
     [
-        ("void", (ord(" "), colors.BLACK, colors.BLACK), 0, True),
         ("wall", (ord("#"), colors.DARK_FADED_BROWN, colors.BLACK), 0, False),
+        ("void", (ord(" "), colors.BLACK, colors.BLACK), 0, True),
         ("floor", (ord("."), colors.DARK_GREY, colors.BLACK), 1, True),
         # add new tiles here, before debug
 
@@ -28,8 +28,8 @@ TILES = np.asarray(
 TILES.flags.writeable = False
 
 class TileIndices(IntEnum):
-    VOID=0 # First value in list HAS to be set to zero, as default IntEnum numbering starts at 1
-    WALL=auto()
+    WALL=0 # First value in list HAS to be set to zero, as default IntEnum numbering starts at 1
+    VOID=auto()
     FLOOR=auto()
     # new enumerations go here, before DEBUG, which should always be last.
 

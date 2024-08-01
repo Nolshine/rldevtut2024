@@ -34,8 +34,6 @@ def main() -> None:
     world[None].components["Random"] = rng
     player = create_actor(int(SCREEN_W/2), int(SCREEN_H/2), "@", colors.WHITE, world)
     player.tags.add(IsPlayer)
-    npc = create_actor(int(SCREEN_W/2) + 2, int(SCREEN_H/2), "?", colors.YELLOW, world)
-    npc.tags.add("Npc")
 
     map_ = generate_caves(
         world,

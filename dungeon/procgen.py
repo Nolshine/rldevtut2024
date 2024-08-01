@@ -95,13 +95,12 @@ def generate_dungeon(
 ) -> tcod.ecs.Entity:
     rng = world[None].components["Random"]
     (player,) = world.Q.all_of(tags=[IsPlayer])
-    (npc,) = world.Q.all_of(tags=["Npc"]) # TODO: remove when implementing non-player actors
 
     map_ = world[object()]
     shape = MapShape(map_width, map_height)
     map_.components[Tiles] = np.full(shape.raw, TileIndices.WALL, dtype=np.int8)
     map_.components[VisibleTiles] = np.zeros(shape.raw, dtype=np.bool)
-    map_.components[ExploredTiles] = np.zeros(shape.raw, dtype=np.int8)
+    map_.components[ExploredTiles] = np.full(shape.raw, TileIndices.VOID, dtype=np.int8)
     map_.components[MapShape] = shape
     map_tiles = map_.components[Tiles]
 
@@ -132,10 +131,6 @@ def generate_dungeon(
                 map_tiles[x, y] = TileIndices.FLOOR
         
         rooms.append(new_room)
-
-    # for testing
-    npc.components[Position] = Position(*rooms[-1].center)
-    npc.relation_tag[InMap] = map_
     
     return map_
 
@@ -178,6 +173,8 @@ def generate_caves(
     ]
 
     # create a list of slices that represent unconnected regions
+    # must make a copy that adjusts wall to be the 'background', in other words wall tiles are 0
+    # adjusted = map_tiles-1
     labelled, num_features = ndi.label(map_tiles, structure=s)
     regions: list[tuple[slice, slice, None]] = ndi.find_objects(labelled)
     isolated: list[tuple[slice, slice, None]] = []
@@ -191,7 +188,7 @@ def generate_caves(
             # wall in regions that are too small
             map_tiles[region_slices[0], region_slices[1]] = np.where(
                 map_tiles[region_slices[0], region_slices[1]] == TileIndices.FLOOR,
-                TileIndices.WALL,
+                TileIndices.DEBUG,
                 map_tiles[region_slices[0], region_slices[1]]
             )
         else:

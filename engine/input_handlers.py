@@ -3,7 +3,7 @@ from typing import Optional, Callable
 import tcod.event
 import tcod.ecs
 
-from actions.actions import Move, escape_action, regenenerate_map
+from actions.actions import Move, escape_action, regenenerate_map, reveal_map
 
 
 
@@ -43,5 +43,7 @@ class DefaultHandler(tcod.event.EventDispatch[Callable[[tcod.ecs.Entity], None]]
 
         elif key == tcod.event.KeySym.F1: # TODO: Remove when finished with testing builds
             action = regenenerate_map
+        elif key == tcod.event.KeySym.F2:
+            action = reveal_map
 
         return action

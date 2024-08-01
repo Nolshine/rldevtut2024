@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import time
-from typing import Any
 
+import numpy as np
 import tcod.ecs
 
 from constants.game_constants import SCREEN_W, SCREEN_H
 from constants.map_constants import *
-from constants.tags import ActiveMap, IsPlayer
-from components.components import Position, Tiles
+from constants.tags import ActiveMap, IsPlayer, InMap
+from components.components import Position, Tiles, ExploredTiles
 from dungeon.procgen import generate_caves
 from dungeon.tiles import TileIndices
 from engine.actor_helpers import update_fov
@@ -45,3 +45,8 @@ def regenenerate_map(entity: tcod.ecs.Entity) -> None: # TODO: remove when not i
     )
     r[None].relation_tag[ActiveMap] = map_
     update_fov(entity)
+
+def reveal_map(entity: tcod.ecs.Entity):
+    r = entity.registry
+    map_ = entity.relation_tag[InMap]
+    map_.components[ExploredTiles] = np.copy(map_.components[Tiles])
