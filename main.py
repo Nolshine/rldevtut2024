@@ -32,7 +32,7 @@ def main() -> None:
     rng = Random()
     rng.seed(seed)
     world[None].components["Random"] = rng
-    player = create_actor(int(SCREEN_W/2), int(SCREEN_H/2), "@", colors.WHITE, world)
+    player = create_actor("Player", int(SCREEN_W/2), int(SCREEN_H/2), "@", colors.WHITE, world, True)
     player.tags.add(IsPlayer)
 
     map_ = generate_caves(

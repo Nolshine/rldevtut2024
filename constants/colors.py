@@ -11,3 +11,5 @@ MAGENTA = (255, 0, 255)
 # complex colours
 DARK_FADED_BROWN = (82, 73, 70)
 DARK_GREY = (36, 36, 36)
+ORC = (52, 255, 20)
+TROLL = (120, 173, 255)

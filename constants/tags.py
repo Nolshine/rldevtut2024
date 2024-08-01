@@ -5,6 +5,8 @@ from typing import Final
 
 # Identity/categorisation tags
 IsPlayer: Final = "IsPlayer"
+IsActor: Final = "IsActor"
+IsBlocking: Final = "IsBlocking" # an entity that blocks movement
 
 
 # Association/relational tags

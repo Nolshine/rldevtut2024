@@ -8,11 +8,20 @@ import scipy.ndimage as ndi
 from numpy.typing import NDArray
 import tcod
 import tcod.ecs
+import tcod.ecs.entity
 
 from components.components import Tiles, VisibleTiles, ExploredTiles, Position, MapShape
+from constants.map_constants import (
+    MAX_MONSTERS_PER_ROOM,
+    CA_FIRST_PASSES,
+    CA_SECOND_PASSES,
+    CA_MIN_WALLS,
+    CA_MIN_FLOORS
+)
+from constants.tags import IsActor, IsPlayer, InMap
 from dungeon.tiles import TileIndices
-from constants.map_constants import CA_FIRST_PASSES, CA_SECOND_PASSES, CA_MIN_WALLS, CA_MIN_FLOORS
-from constants.tags import IsPlayer, InMap
+from engine.actor_helpers import create_actor
+import constants.colors as colors
 
 import random
 
@@ -92,8 +101,8 @@ def generate_dungeon(
         room_max_size: int,
         room_min_size: int,
         max_rooms: int,
-) -> tcod.ecs.Entity:
-    rng = world[None].components["Random"]
+) -> tuple[tcod.ecs.Entity, list[RectangularRoom]]:
+    rng: random.Random = world[None].components["Random"]
     (player,) = world.Q.all_of(tags=[IsPlayer])
 
     map_ = world[object()]
@@ -132,7 +141,7 @@ def generate_dungeon(
         
         rooms.append(new_room)
     
-    return map_
+    return map_, rooms
 
 def generate_caves(
         world: tcod.ecs.Registry,
@@ -141,11 +150,10 @@ def generate_caves(
         room_max_size: int,
         room_min_size: int,
         max_rooms: int,
-        seed: int | None = None,
 ) -> tcod.ecs.Entity:
     print("Generating caves...")
-    rng = world[None].components["Random"]
-    map_ = generate_dungeon(world, map_width, map_height, room_max_size, room_min_size, max_rooms)
+    rng: random.Random = world[None].components["Random"]
+    map_, rooms = generate_dungeon(world, map_width, map_height, room_max_size, room_min_size, max_rooms)
     shape = map_.components[MapShape]
     map_tiles = map_.components[Tiles]
     map_tiles2 = np.copy(map_.components[Tiles])
@@ -173,8 +181,6 @@ def generate_caves(
     ]
 
     # create a list of slices that represent unconnected regions
-    # must make a copy that adjusts wall to be the 'background', in other words wall tiles are 0
-    # adjusted = map_tiles-1
     labelled, num_features = ndi.label(map_tiles, structure=s)
     regions: list[tuple[slice, slice, None]] = ndi.find_objects(labelled)
     isolated: list[tuple[slice, slice, None]] = []
@@ -188,7 +194,7 @@ def generate_caves(
             # wall in regions that are too small
             map_tiles[region_slices[0], region_slices[1]] = np.where(
                 map_tiles[region_slices[0], region_slices[1]] == TileIndices.FLOOR,
-                TileIndices.DEBUG,
+                TileIndices.WALL,
                 map_tiles[region_slices[0], region_slices[1]]
             )
         else:
@@ -209,6 +215,23 @@ def generate_caves(
         for x, y in tunnel_between(world, (x1, y1), (x2, y2)): # TODO: more organic tunneling function
             map_tiles[x, y] = TileIndices.FLOOR
 
+    # place monsters in rooms
+    for i in range(len(rooms)):
+    # for i in range(1):
+        if i == 0:
+            # no monsters in the antechamber
+            continue
+        for j in range(MAX_MONSTERS_PER_ROOM):
+        # for i in range(1):
+            entities = world.Q.all_of(tags=[IsActor], relations=[(InMap, map_)])
+            x, y = rng.randint(rooms[i].x1 + 1, rooms[i].x2), rng.randint(rooms[i].y1 + 1, rooms[i].y2)
+            if (not map_tiles[x, y] == TileIndices.WALL) and (not any(e.components[Position].raw == (x, y) for e in entities)):
+                new_actor: tcod.ecs.Entity
+                if rng.random() < 0.8:
+                    new_actor = create_actor("Orc", x, y, "o", colors.ORC, world, True) # Orc
+                else:
+                    new_actor = create_actor("Troll", x, y, "T", colors.TROLL, world, True) # Troll
+                new_actor.relation_tag[InMap] = map_
 
     map_.components[Tiles] = map_tiles
 

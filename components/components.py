@@ -38,6 +38,8 @@ class MapShape:
     @property
     def raw(self) -> tuple[int, int]:
         return (self.width, self.height)
+    
+Name: Final = ("Name", str)
 
 Tiles: Final = ("Tiles", NDArray[np.int8])
 VisibleTiles: Final = ("VisibleTiles", NDArray[np.bool])
