@@ -4,9 +4,11 @@ from tcod.console import Console
 from tcod.event import Event
 from tcod.ecs import Entity, Registry
 
-from constants.tags import IsPlayer, ActiveMap
+from components.components import Name
+from constants.tags import IsActor, IsPlayer, ActiveMap, InMap
 from engine.input_handlers import DefaultHandler
 from engine.render_helpers import render_all_entities, render_map
+from actions.action_helpers import do_player_action
 
 
 
@@ -31,7 +33,7 @@ class DefaultState(State):
 
         if action is None:
             return
-        action(player)
+        do_player_action(player, action)
     
     def on_draw(self, console: Console) -> None:
         (player,) = self.world.Q.all_of(tags=[IsPlayer])

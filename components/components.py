@@ -5,6 +5,9 @@ from typing import Final
 import numpy as np
 from numpy.typing import NDArray
 
+import tcod.ecs
+import tcod.ecs.callbacks
+
 
 
 class Position:
@@ -44,3 +47,12 @@ Name: Final = ("Name", str)
 Tiles: Final = ("Tiles", NDArray[np.int8])
 VisibleTiles: Final = ("VisibleTiles", NDArray[np.bool])
 ExploredTiles: Final = ("ExploredTiles", NDArray[np.int8])
+
+@tcod.ecs.callbacks.register_component_changed(component=Position)
+def on_position_changed(e: tcod.ecs.Entity, old: Position | None, new: Position | None) -> None:
+    if old == new:
+        return
+    if old is not None:
+        e.tags.remove(old.raw)
+    if new is not None:
+        e.tags.add(new.raw)

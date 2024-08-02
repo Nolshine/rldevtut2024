@@ -3,7 +3,7 @@ from typing import Optional, Callable
 import tcod.event
 import tcod.ecs
 
-from actions.actions import Move, escape_action, regenenerate_map, reveal_map
+from actions.actions import Bump, escape_action, regenenerate_map, reveal_map
 
 
 
@@ -36,7 +36,7 @@ class DefaultHandler(tcod.event.EventDispatch[Callable[[tcod.ecs.Entity], None]]
         key = event.sym
 
         if key in movement_keys:
-            action = Move(*movement_keys[key])
+            action = Bump(*movement_keys[key])
         
         elif key == tcod.event.KeySym.ESCAPE:
             action = escape_action

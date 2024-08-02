@@ -19,7 +19,7 @@ from constants.map_constants import (
     CA_MIN_FLOORS
 )
 from constants.tags import IsPlayer, InMap
-from dungeon.map_tools import RectangularRoom, place_monsters_in_rooms, tunnel_between
+from dungeon.map_helpers import RectangularRoom, place_monsters_in_rooms, tunnel_between
 from dungeon.tiles import TileIndices
 
 import random

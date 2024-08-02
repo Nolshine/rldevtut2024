@@ -8,9 +8,9 @@ import tcod.ecs
 from constants.game_constants import SCREEN_W, SCREEN_H
 from constants.map_constants import *
 from constants.tags import ActiveMap, IsActor, IsBlocking, IsPlayer, InMap
-from components.components import Position, Tiles, ExploredTiles
+from components.components import Name, Position, Tiles, ExploredTiles
 from dungeon.procgen import generate_caves
-from dungeon.tiles import TileIndices
+from dungeon.tiles import TileIndices, TILES
 from engine.actor_helpers import update_fov
 
 class Move:
@@ -24,14 +24,43 @@ class Move:
         pos = entity.components[Position]
         target = Position(pos.x + self.dx, pos.y + self.dy)
         map_tiles = r[None].relation_tag[ActiveMap].components[Tiles]
-        if map_tiles[target.x, target.y] == TileIndices.WALL:
-            return
-        entities = r.Q.all_of(tags=[IsActor, IsBlocking], relations=[(InMap, map_)])
-        if any(e.components[Position].raw == target.raw for e in entities):
-            return
         entity.components[Position] = target
         if IsPlayer in entity.tags:
             update_fov(entity)
+
+class Melee:
+    def __init__(self, dx: int, dy: int, target: tcod.ecs.Entity):
+        self.dx = dx
+        self.dy = dy
+        self.target = target
+
+    def __call__(self, entity: tcod.ecs.Entity):
+        prefix: str
+        if IsPlayer in entity.tags:
+            prefix = "You kick"
+        else:
+            prefix = f"The {entity.components[Name]} kicks"
+        attack_str: str = f"{prefix} the {self.target.components[Name]}. They're not amused."
+        print(attack_str)
+
+class Bump:
+    def __init__(self, dx: int, dy: int):
+        self.dx = dx
+        self.dy = dy
+    
+    def __call__(self, entity: tcod.ecs.Entity):
+        map_ = entity.relation_tag[InMap]
+        r = entity.registry
+        pos = entity.components[Position]
+        target = Position(pos.x + self.dx, pos.y + self.dy)
+        map_tiles = r[None].relation_tag[ActiveMap].components[Tiles]
+        if TILES[map_tiles[target.x, target.y]]["walk_cost"] == 0:
+            return
+        entities = r.Q.all_of(tags=[IsActor, IsBlocking, target.raw], relations=[(InMap, map_)]).get_entities()
+        if len(entities) > 0:
+            Melee(self.dx, self.dy, list(entities)[0])(entity)
+        else:
+            Move(self.dx, self.dy)(entity)
 
 def escape_action(entity: tcod.ecs.Entity) -> None:
     raise SystemExit()
