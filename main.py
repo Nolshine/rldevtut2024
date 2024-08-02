@@ -6,6 +6,7 @@ import tcod
 import tcod.ecs
 from typing import TYPE_CHECKING, Callable, Optional
 
+from components.components import Graphic
 import constants.colors as colors
 from constants.game_constants import *
 from constants.map_constants import *
@@ -14,6 +15,7 @@ from engine.game_globals import *
 from engine.actor_helpers import create_actor, update_fov
 from engine.states import DefaultState
 from dungeon.procgen import generate_caves
+import mobs.entity_prefabs as prefabs
 
 
 
@@ -32,7 +34,7 @@ def main() -> None:
     rng = Random()
     rng.seed(seed)
     world[None].components["Random"] = rng
-    player = create_actor("Player", int(SCREEN_W/2), int(SCREEN_H/2), "@", colors.WHITE, world, True)
+    player = create_actor((0, 0), prefabs.player, world)
     player.tags.add(IsPlayer)
 
     map_ = generate_caves(

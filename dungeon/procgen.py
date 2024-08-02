@@ -22,6 +22,7 @@ from constants.tags import IsActor, IsPlayer, InMap
 from dungeon.tiles import TileIndices
 from engine.actor_helpers import create_actor
 import constants.colors as colors
+import mobs.entity_prefabs as prefabs
 
 import random
 
@@ -203,8 +204,6 @@ def generate_caves(
 
     # connect isolated regions
     for r1, r2 in pairwise(isolated):
-        print("connecting regions:") # TODO: Remove when done testing
-        print(f"{r1} / {r2}") # Remove when done testing
         good = False
         while not good:
             good = True
@@ -228,9 +227,9 @@ def generate_caves(
             if (not map_tiles[x, y] == TileIndices.WALL) and (not any(e.components[Position].raw == (x, y) for e in entities)):
                 new_actor: tcod.ecs.Entity
                 if rng.random() < 0.8:
-                    new_actor = create_actor("Orc", x, y, "o", colors.ORC, world, True) # Orc
+                    new_actor = create_actor((x, y), prefabs.orc, world)
                 else:
-                    new_actor = create_actor("Troll", x, y, "T", colors.TROLL, world, True) # Troll
+                    new_actor = create_actor((x, y), prefabs.troll, world)
                 new_actor.relation_tag[InMap] = map_
 
     map_.components[Tiles] = map_tiles

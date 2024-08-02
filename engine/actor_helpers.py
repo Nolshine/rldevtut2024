@@ -4,21 +4,22 @@ import numpy as np
 import tcod
 import tcod.constants
 import tcod.ecs
+import tcod.ecs.entity
 import tcod.map
 
 from components.components import Graphic, Position, Name
 from components.components import Tiles, VisibleTiles, ExploredTiles
 from constants.tags import InMap, IsActor, IsBlocking
 from constants.game_constants import PLAYER_FOV_RADIUS
-from dungeon.tiles import TILES, TileIndices
+from dungeon.tiles import TILES
 
-def create_actor(name: str, x: int, y: int, char: str, fg: Tuple[int, int, int], world: tcod.ecs.Registry, blocking: bool) -> tcod.ecs.Entity:
+def create_actor(pos: tuple[int, int], prefab: dict, world: tcod.ecs.Registry) -> tcod.ecs.Entity:
     entity = world[object()]
-    entity.components[Name] = name
-    entity.components[Position] = Position(x, y)
-    entity.components[Graphic] = Graphic(char, fg)
+    entity.components[Name] = prefab["Name"]
+    entity.components[Position] = Position(pos[0], pos[1])
+    entity.components[Graphic] = prefab["Graphic"]
     entity.tags.add(IsActor)
-    if blocking:
+    if prefab["IsBlocking"]:
         entity.tags.add(IsBlocking)
     return entity
 
