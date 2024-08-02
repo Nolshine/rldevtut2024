@@ -12,15 +12,16 @@ from components.components import Tiles, VisibleTiles, ExploredTiles
 from constants.tags import InMap, IsActor, IsBlocking
 from constants.game_constants import PLAYER_FOV_RADIUS
 from dungeon.tiles import TILES
+from mobs.entity_prefabs import EntityPrefab
 
-def create_actor(pos: tuple[int, int], prefab: dict, world: tcod.ecs.Registry) -> tcod.ecs.Entity:
+def create_actor(pos: tuple[int, int], prefab: EntityPrefab, world: tcod.ecs.Registry) -> tcod.ecs.Entity:
     entity = world[object()]
-    entity.components[Name] = prefab["Name"]
+    entity.components[Name] = prefab.name
     entity.components[Position] = Position(pos[0], pos[1])
-    entity.components[Graphic] = prefab["Graphic"]
+    entity.components[Graphic] = prefab.graphic
     entity.tags.add(IsActor)
-    if prefab["IsBlocking"]:
-        entity.tags.add(IsBlocking)
+    for tag in prefab.tags:
+        entity.tags.add(tag)
     return entity
 
 def update_fov(entity: tcod.ecs.Entity) -> None:

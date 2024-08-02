@@ -35,7 +35,7 @@ def main() -> None:
     rng.seed(seed)
     world[None].components["Random"] = rng
     player = create_actor((0, 0), prefabs.player, world)
-    player.tags.add(IsPlayer)
+    # player.tags.add(IsPlayer)
 
     map_ = generate_caves(
         world,
