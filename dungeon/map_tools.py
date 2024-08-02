@@ -52,7 +52,7 @@ def tunnel_between(
         end: tuple[int, int],
 ) -> Iterator[tuple[int, int]]:
     """Return an L-shaped tunnel between these two points."""
-    rng = world[None].components["Random"]
+    rng: Random = world[None].components["Random"]
     x1, y1 = start
     x2, y2 = end
     if rng.random()  < 0.5:
@@ -67,7 +67,7 @@ def tunnel_between(
         yield x, y
 
 
-def place_monsters_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom], world: tcod.ecs.Registry):
+def place_monsters_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom], world: tcod.ecs.Registry) -> None:
     rng: Random = world[None].components["Random"]
     map_tiles: NDArray[np.int8] = map_.components[Tiles]
     for i in range(len(rooms)):
@@ -79,7 +79,8 @@ def place_monsters_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom],
         # for i in range(1):
             entities = world.Q.all_of(tags=[IsActor], relations=[(InMap, map_)])
             x, y = rng.randint(rooms[i].x1 + 1, rooms[i].x2), rng.randint(rooms[i].y1 + 1, rooms[i].y2)
-            if (not map_tiles[x, y] == TileIndices.WALL) and (not any(e.components[Position].raw == (x, y) for e in entities)):
+            if ((not map_tiles[x, y] == TileIndices.WALL) and
+                (not any(e.components[Position].raw == (x, y) for e in entities))):
                 new_actor: tcod.ecs.Entity
                 if rng.random() < 0.8:
                     new_actor = create_actor((x, y), prefabs.orc, world)

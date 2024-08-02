@@ -41,7 +41,7 @@ def regenenerate_map(entity: tcod.ecs.Entity) -> None: # TODO: remove when not i
     new_seed = int(time.time())
     print(f"Seed: {new_seed}")
     r[None].components["Random"].seed(new_seed)
-    (e.clear() for e in r.Q.all_of(relations=[(InMap, ...)]).none_of(tags=[IsPlayer]))
+    map(lambda e : e.clear(), r.Q.all_of(relations=[(InMap, ...)]).none_of(tags=[IsPlayer]))
     r[None].relation_tag[ActiveMap].clear()
     map_ = generate_caves(
         r,
