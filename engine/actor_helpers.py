@@ -9,7 +9,7 @@ import tcod.map
 
 from components.components import Graphic, Position, Name
 from components.components import Tiles, VisibleTiles, ExploredTiles
-from constants.tags import InMap, IsActor, IsBlocking
+from constants.tags import InMap, IsActor
 from constants.game_constants import PLAYER_FOV_RADIUS
 from dungeon.tiles import TILES
 from mobs.entity_prefabs import EntityPrefab

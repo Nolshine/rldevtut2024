@@ -1,7 +1,8 @@
+from typing import Optional, Callable
+
 import tcod.event
 import tcod.ecs
 
-from actions.action import Action
 from actions.actions import Bump, escape_action, regenenerate_map, reveal_map
 
 
@@ -25,12 +26,12 @@ movement_keys = {
     tcod.event.KeySym.KP_3: (1, 1),
 }
 
-class DefaultHandler(tcod.event.EventDispatch[Action]):
-    def ev_quit(self, event: tcod.event.Quit) -> None:
+class DefaultHandler(tcod.event.EventDispatch[Callable[[tcod.ecs.Entity], None]]):
+    def ev_quit(self, event: tcod.event.Quit) -> Optional[Callable[[tcod.ecs.Entity], None]]:
         raise SystemExit()
     
-    def ev_keydown(self, event: tcod.event.KeyDown) -> Action | None:
-        action: Action | None = None # This will be returned if no valid key is presed
+    def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[Callable[[tcod.ecs.Entity], None]]:
+        action: Optional[Callable[[tcod.ecs.Entity], None]] = None # This will be returned if no valid key is presed
 
         key = event.sym
 

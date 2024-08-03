@@ -9,6 +9,8 @@ from numpy.typing import NDArray
 import tcod.ecs
 import tcod.ecs.callbacks
 
+from actions.action import Action
+
 
 @attrs.define(frozen=True)
 class Position:
@@ -43,10 +45,26 @@ class MapShape:
         return (self.width, self.height)
     
 Name: Final = ("Name", str)
+"""An entity's name."""
+HP: Final = ("HP", int)
+"""An actor's current hitpoints."""
+MaxHP: Final = ("Max_HP", int)
+"""An actor's maximum hitpoints."""
+PowerMin: Final = ("PowerMin", int)
+"""An entity's minimum damage."""
+PowerMax: Final = ("PowerMax", int)
+"""An entity's maximum damage."""
+Defense: Final = ("Defense", int)
+"""An entity's armor value."""
+AI: Final = ("AI", Action)
+"""An actor's AI action."""
 
 Tiles: Final = ("Tiles", NDArray[np.int8])
+"""A map's tile composition."""
 VisibleTiles: Final = ("VisibleTiles", NDArray[np.bool])
+"""A player's currently visible tiles."""
 ExploredTiles: Final = ("ExploredTiles", NDArray[np.int8])
+"""A map's tiles that have already been seen."""
 
 @tcod.ecs.callbacks.register_component_changed(component=Position)
 def on_position_changed(e: tcod.ecs.Entity, old: Position | None, new: Position | None) -> None:

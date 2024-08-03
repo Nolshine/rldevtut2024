@@ -8,7 +8,7 @@ from tcod.ecs import Entity, Registry
 from constants.tags import IsPlayer, ActiveMap
 from engine.input_handlers import DefaultHandler
 from engine.render_helpers import render_all_entities, render_map
-from actions.action import Action, ActionResult
+from actions.action import Action
 from actions.action_helpers import do_player_action
 
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterator
+from typing import Iterator, TYPE_CHECKING
 from random import Random
 
 import numpy as np
@@ -10,11 +10,12 @@ import tcod
 import tcod.ecs
 
 import mobs.entity_prefabs as prefabs
-from components.components import Position, Tiles
+from components.components import Position, Tiles, AI
 from constants.map_constants import MAX_MONSTERS_PER_ROOM
 from constants.tags import InMap, IsActor
 from dungeon.tiles import TileIndices
 from engine.actor_helpers import create_actor
+from actions.actions import SimpleEnemy
 
 class RectangularRoom:
     """A rectangular room."""
@@ -82,8 +83,11 @@ def place_monsters_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom],
             if ((not map_tiles[x, y] == TileIndices.WALL) and
                 (not any(e.components[Position].raw == (x, y) for e in entities))):
                 new_actor: tcod.ecs.Entity
+                prefab: prefabs.EntityPrefab
                 if rng.random() < 0.8:
-                    new_actor = create_actor((x, y), prefabs.orc, world)
+                    prefab = prefabs.orc
                 else:
-                    new_actor = create_actor((x, y), prefabs.troll, world)
+                    prefab = prefabs.troll
+                new_actor = create_actor((x, y), prefab, world)
+                new_actor.components[AI] = SimpleEnemy()
                 new_actor.relation_tag[InMap] = map_

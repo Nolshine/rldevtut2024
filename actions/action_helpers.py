@@ -6,8 +6,7 @@ import tcod.ecs
 
 from actions.action import Success, ActionResult
 from constants.tags import IsPlayer, IsActor, ActiveMap, InMap
-from components.components import Name
-from engine.actor_helpers import update_fov
+from components.components import Name, AI
 
 
 def do_player_action(player: tcod.ecs.Entity, action: Callable[[tcod.ecs.Entity], None]):
@@ -20,6 +19,6 @@ def do_player_action(player: tcod.ecs.Entity, action: Callable[[tcod.ecs.Entity]
 
 def do_enemy_actions(r: tcod.ecs.Registry):
         map_ = r[None].relation_tag[ActiveMap]
-        npcs = r.Q.all_of(tags=[IsActor], relations=[(InMap, map_)]).none_of(tags=[IsPlayer])
+        npcs = r.Q.all_of(components=[AI], tags=[IsActor], relations=[(InMap, map_)]).none_of(tags=[IsPlayer])
         for entity in npcs:
-            print(f"The {entity.components[Name]} wonders when it can have a go.")
+            entity.components[AI](entity)
