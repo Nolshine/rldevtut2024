@@ -48,7 +48,7 @@ Name: Final = ("Name", str)
 """An entity's name."""
 HP: Final = ("HP", int)
 """An actor's current hitpoints."""
-MaxHP: Final = ("Max_HP", int)
+HPMax: Final = ("Max_HP", int)
 """An actor's maximum hitpoints."""
 PowerMin: Final = ("PowerMin", int)
 """An entity's minimum damage."""

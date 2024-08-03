@@ -5,7 +5,7 @@ import tcod.console
 import tcod.ecs.registry
 import tcod.ecs.entity
 
-from constants.tags import IsPlayer, InMap, ActiveMap
+from constants.tags import IsActor, IsPlayer, InMap, ActiveMap
 from constants.game_constants import SCREEN_W, SCREEN_H
 from components.components import Position, Graphic, MapShape, Tiles, VisibleTiles, ExploredTiles
 from dungeon.tiles import TILES
@@ -13,9 +13,14 @@ from dungeon.tiles import TILES
 
 
 def render_all_entities(root_console: tcod.console.Console, world: tcod.ecs.Registry, player: tcod.ecs.Entity) -> None:
+    actor_drawn = set()
     for entity in world.Q.all_of(components=[Position, Graphic], relations=[(InMap, world[None].relation_tag[ActiveMap])]):
         if IsPlayer in entity.tags:
-            continue
+            continue # Always draw player last
+        if entity.components[Position].raw in actor_drawn:
+            continue # Do not draw over actor
+        if IsActor in entity.tags:
+            actor_drawn.add(entity.components[Position].raw)
         render_entity(root_console, entity)
     render_entity(root_console, player)
 

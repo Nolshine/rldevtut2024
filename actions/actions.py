@@ -14,6 +14,7 @@ from components.components import Name, Position, Tiles, VisibleTiles, ExploredT
 from dungeon.tiles import TILES
 from engine.actor_helpers import update_fov
 from engine.path_tools import path_to
+from mobs.combat import melee_damage, apply_damage
 
 class Move:
     def __init__(self, dx: int, dy: int) -> None:
@@ -43,17 +44,22 @@ class Melee:
 
     def __call__(self, entity: tcod.ecs.Entity) -> ActionResult:
         new_pos = entity.components[Position] + (self.dx, self.dy)
+        attacker_is_player = IsPlayer in entity.tags
         try:
             (target,) = entity.registry.Q.all_of(tags=[IsActor, new_pos])
         except ValueError:
             return Failure("Nothing there to attack.")
-        prefix: str
-        if IsPlayer in entity.tags:
-            prefix = "You kick"
+        defender_is_player = IsPlayer in entity.tags
+        dmg = melee_damage(entity, target)
+        attack_desc: str
+        if attacker_is_player:
+            attack_desc = f"You hit the {target.components[Name]} for {dmg} HP!"
+        elif defender_is_player:
+            attack_desc = f"The {entity.components[Name]} hits you for {dmg} HP!"
         else:
-            prefix = f"The {entity.components[Name]} kicks"
-        attack_str: str = f"{prefix} the {target.components[Name]}. They're not amused."
-        print(attack_str)
+            attack_desc = f"The {entity.components[Name]} hits the {target.components[Name]} for {dmg} HP!"
+        print(attack_desc)
+        apply_damage(target, dmg)
         return Success()
 
 class Bump:

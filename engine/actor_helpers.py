@@ -7,7 +7,7 @@ import tcod.ecs
 import tcod.ecs.entity
 import tcod.map
 
-from components.components import Graphic, Position, Name
+from components.components import Graphic, Position, Name, HP, HPMax, PowerMin, PowerMax, Defense
 from components.components import Tiles, VisibleTiles, ExploredTiles
 from constants.tags import InMap, IsActor
 from constants.game_constants import PLAYER_FOV_RADIUS
@@ -22,6 +22,15 @@ def create_actor(pos: tuple[int, int], prefab: EntityPrefab, world: tcod.ecs.Reg
     entity.tags.add(IsActor)
     for tag in prefab.tags:
         entity.tags.add(tag)
+    if prefab.hp_max:
+        entity.components[HPMax] = prefab.hp_max
+        entity.components[HP] = prefab.hp_max
+    if prefab.power_min:
+        entity.components[PowerMin] = prefab.power_min
+    if prefab.power_max:
+        entity.components[PowerMax] = prefab.power_max
+    if prefab.defense:
+        entity.components[Defense] = prefab.defense
     return entity
 
 def update_fov(entity: tcod.ecs.Entity) -> None:

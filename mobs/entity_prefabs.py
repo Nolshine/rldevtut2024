@@ -10,8 +10,36 @@ from constants.tags import IsActor, IsBlocking, IsPlayer
 class EntityPrefab:
     name: str
     graphic: Graphic
+    hp_max: int | None
+    power_min: int | None
+    power_max: int | None
+    defense: int | None
     tags: list[str]
 
-player = EntityPrefab("Player", Graphic("@", colors.WHITE), [IsActor, IsBlocking, IsPlayer])
-orc = EntityPrefab("Orc", Graphic("o", colors.ORC), [IsActor, IsBlocking])
-troll = EntityPrefab("Troll", Graphic("T", colors.TROLL), [IsActor, IsBlocking])
+player = EntityPrefab(
+    name="Player",
+    graphic=Graphic("@", colors.WHITE),
+    hp_max=30,
+    power_min=3,
+    power_max=5,
+    defense=2,
+    tags=[IsPlayer, IsActor, IsBlocking]
+)
+orc = EntityPrefab(
+    name="Orc",
+    graphic=Graphic("o", colors.ORC),
+    hp_max=10,
+    power_min=1,
+    power_max=3,
+    defense=0,
+    tags=[IsActor, IsBlocking]
+)
+troll = EntityPrefab(
+    name="Troll",
+    graphic=Graphic("T", colors.TROLL),
+    hp_max=16,
+    power_min=2,
+    power_max=4,
+    defense=1,
+    tags=[IsActor, IsBlocking]
+)
