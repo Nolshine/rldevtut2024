@@ -4,10 +4,11 @@ from tcod.console import Console
 from tcod.event import Event
 from tcod.ecs import Entity, Registry
 
-from components.components import Name
-from constants.tags import IsActor, IsPlayer, ActiveMap, InMap
+
+from constants.tags import IsPlayer, ActiveMap
 from engine.input_handlers import DefaultHandler
 from engine.render_helpers import render_all_entities, render_map
+from actions.action import Action, ActionResult
 from actions.action_helpers import do_player_action
 
 
@@ -29,7 +30,7 @@ class DefaultState(State):
 
     def on_event(self, event: Event) -> None:
         (player,) = self.world.Q.all_of(tags=[IsPlayer])
-        action: Optional[Callable[[Entity], None]] = self.event_handler.dispatch(event)
+        action: Action | None = self.event_handler.dispatch(event)
 
         if action is None:
             return
