@@ -21,11 +21,16 @@ class Move:
         self.dy = dy
 
     def __call__(self, entity: tcod.ecs.Entity) -> ActionResult:
+        r = entity.registry
+        map_ = entity.relation_tag[InMap]
         map_tiles = entity.registry[None].relation_tag[ActiveMap].components[Tiles]
         pos = entity.components[Position]
         target = Position(pos.x + self.dx, pos.y + self.dy)
         if TILES[map_tiles[target.x, target.y]]["walk_cost"] == 0:
             return Failure("WARNING: Move action attempted into unwalkable tile.")
+        blocking = r.Q.all_of(tags=[IsActor, IsBlocking, target], relations=[(InMap, map_)]).get_entities()
+        if len(blocking) > 0:
+            return Failure("Something is blocking the way.")
         entity.components[Position] = target
         if IsPlayer in entity.tags:
             update_fov(entity)
