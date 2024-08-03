@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import attrs
 import numpy as np
 from numpy.typing import NDArray
 
@@ -9,12 +10,11 @@ import tcod.ecs
 import tcod.ecs.callbacks
 
 
-
+@attrs.define(frozen=True)
 class Position:
     """An entity's position on a map."""
-    def __init__(self, x: int, y: int) -> None:
-        self.x = x
-        self.y = y
+    x: int
+    y: int
 
     def __add__(self, other: Position | tuple[int, int]) -> Position:
         """Return a new position, offset by 'other'."""
@@ -27,11 +27,11 @@ class Position:
     def raw(self) -> tuple[int, int]:
         return (self.x, self.y)
     
+@attrs.define(frozen=True)
 class Graphic:
     """An entity's visual representation."""
-    def __init__(self, char: str, fg: tuple[int, int, int]):
-        self.char = char
-        self.fg = fg
+    char: str
+    fg: tuple[int, int, int]
 
 class MapShape:
     def __init__(self, width: int, height: int) -> None:
@@ -53,6 +53,6 @@ def on_position_changed(e: tcod.ecs.Entity, old: Position | None, new: Position 
     if old == new:
         return
     if old is not None:
-        e.tags.remove(old.raw)
+        e.tags.remove(old)
     if new is not None:
-        e.tags.add(new.raw)
+        e.tags.add(new)
