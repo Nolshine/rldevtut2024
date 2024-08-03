@@ -3,7 +3,7 @@ from typing import Optional, Callable
 import tcod.event
 import tcod.ecs
 
-from actions.actions import Bump, escape_action, regenenerate_map, reveal_map
+from actions.actions import Bump, escape_action, regenenerate_map, reveal_map, wait_action
 
 
 
@@ -19,12 +19,16 @@ movement_keys = {
     tcod.event.KeySym.KP_8: (0, -1),
     tcod.event.KeySym.KP_9: (1, -1),
     tcod.event.KeySym.KP_4: (-1, 0),
-    # tcod.event.KeySym.KP_5: (0, 0), # pass turn key
     tcod.event.KeySym.KP_6: (1, 0),
     tcod.event.KeySym.KP_1: (-1, 1),
     tcod.event.KeySym.KP_2: (0, 1),
     tcod.event.KeySym.KP_3: (1, 1),
 }
+
+wait_keys = [
+    tcod.event.KeySym.PERIOD,
+    tcod.event.KeySym.KP_5,
+]
 
 class DefaultHandler(tcod.event.EventDispatch[Callable[[tcod.ecs.Entity], None]]):
     def ev_quit(self, event: tcod.event.Quit) -> Optional[Callable[[tcod.ecs.Entity], None]]:
@@ -37,6 +41,9 @@ class DefaultHandler(tcod.event.EventDispatch[Callable[[tcod.ecs.Entity], None]]
 
         if key in movement_keys:
             action = Bump(*movement_keys[key])
+
+        elif key in wait_keys:
+            action = wait_action
         
         elif key == tcod.event.KeySym.ESCAPE:
             action = escape_action

@@ -88,7 +88,7 @@ class SimpleEnemy:
             # don't path to the player if it's not in the same map
             # this shouldn't occur, so we want to know if it does
             print("WARNING: Actor tried pathing from different map")
-            return wait(actor)
+            return wait_action(actor)
         dx: Final = target_pos.x - actor_pos.x
         dy: Final = target_pos.y - actor_pos.y
         distance: Final = max(abs(dx), abs(dy)) # Chebyshev distance
@@ -99,7 +99,7 @@ class SimpleEnemy:
         if self.path:
             dest: Final = self.path.pop(0)
             return Move(dest.x - actor_pos.x, dest.y - actor_pos.y)(actor)
-        return wait(actor)
+        return wait_action(actor)
 
 
 def escape_action(entity: tcod.ecs.Entity) -> ActionResult:
@@ -131,7 +131,7 @@ def reveal_map(entity: tcod.ecs.Entity) -> ActionResult:
     map_.components[ExploredTiles] = np.copy(map_.components[Tiles])
     return Failure("DEBUG ACTION: reveal map")
 
-def wait(entity: tcod.ecs.Entity) -> ActionResult:
+def wait_action(entity: tcod.ecs.Entity) -> ActionResult:
     # do nothing for one turn
     return Success()
 
