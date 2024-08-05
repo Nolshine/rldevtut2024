@@ -8,6 +8,7 @@ YELLOW = (255, 255, 0)
 CYAN = (0, 255, 255)
 MAGENTA = (255, 0, 255)
 DARK_RED = (127, 0, 0)
+GREY = (140, 140, 140)
 
 # complex colours
 DARK_FADED_BROWN = (82, 73, 70)

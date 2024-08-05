@@ -4,10 +4,10 @@ from random import Random
 
 import tcod.ecs
 
+import constants.colors as colors
 from constants.tags import IsPlayer, IsActor
 from components.main import AI, HP, Defense, Graphic, Name, PowerMin, PowerMax
-import constants.colors as colors
-
+from engine.messaging import add_message
 
 
 def melee_damage(entity: tcod.ecs.Entity, target: tcod.ecs.Entity) -> int:
@@ -25,8 +25,9 @@ def apply_damage(entity: tcod.ecs.Entity, damage: int) -> None:
 def die(entity: tcod.ecs.Entity) -> None:
     """Kill an entity."""
     is_player = IsPlayer in entity.tags
-    # TODO add a message to ingame log
-    print("You died!" if is_player else f"{entity.components[Name]} has died!")
+    death_str = "You died!" if is_player else f"{entity.components[Name]} has died!"
+    color_str = "PLAYER_DIE" if is_player else "ENEMY_DIE"
+    add_message(entity.registry, death_str, color_str)
     entity.components[Graphic] = Graphic("%", colors.DARK_RED)
     entity.components[Name] = f"remains of {entity.components[Name]}"
     if not is_player:

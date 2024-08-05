@@ -13,6 +13,7 @@ from components.main import Name, Position, Tiles, VisibleTiles, ExploredTiles
 from dungeon.tiles import TILES
 from engine.actor_helpers import update_fov
 from engine.path_tools import path_to
+from engine.messaging import add_message
 from mobs.combat import melee_damage, apply_damage
 
 class Move:
@@ -42,6 +43,7 @@ class Melee:
         self.dy = dy
 
     def __call__(self, entity: tcod.ecs.Entity) -> ActionResult:
+        r = entity.registry
         new_pos = entity.components[Position] + (self.dx, self.dy)
         attacker_is_player = IsPlayer in entity.tags
         try:
@@ -51,13 +53,17 @@ class Melee:
         defender_is_player = IsPlayer in entity.tags
         dmg = melee_damage(entity, target)
         attack_desc: str
+        color_str: str
         if attacker_is_player:
             attack_desc = f"You hit the {target.components[Name]} for {dmg} HP!"
+            color_str = "PLAYER_ATK"
         elif defender_is_player:
             attack_desc = f"The {entity.components[Name]} hits you for {dmg} HP!"
+            color_str = "ENEMY_ATK"
         else:
             attack_desc = f"The {entity.components[Name]} hits the {target.components[Name]} for {dmg} HP!"
-        print(attack_desc)
+            color_str = "ENEMY_ATK"
+        add_message(r, attack_desc, color_str)
         apply_damage(target, dmg)
         return Success()
 
@@ -85,14 +91,15 @@ class SimpleEnemy:
         self.path: list[Position] = []
 
     def __call__(self, actor: tcod.ecs.Entity):
-        (target,) = actor.registry.Q.all_of(tags=[IsPlayer])
+        r = actor.registry
+        (target,) = r.Q.all_of(tags=[IsPlayer])
         actor_pos: Final = actor.components[Position]
         target_pos: Final = target.components[Position]
         map_: Final = actor.relation_tag[InMap]
         if not (map_ == target.relation_tag[InMap]):
             # don't path to the player if it's not in the same map
             # this shouldn't occur, so we want to know if it does
-            print("WARNING: Actor tried pathing from different map")
+            add_message(r, "WARNING: Actor tried pathing from different map", "YELLOW")
             return wait_action(actor)
         dx: Final = target_pos.x - actor_pos.x
         dy: Final = target_pos.y - actor_pos.y

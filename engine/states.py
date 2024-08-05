@@ -11,7 +11,7 @@ from constants.tags import IsPlayer
 from constants.controls import MOVEMENT_KEYS, WAIT_KEYS
 from constants.gui_constants import HEALTH_BAR_WIDTH
 from components.main import HP, HPMax
-from engine.render_helpers import render_all_entities, render_map, render_bar
+from engine.render_helpers import render_main
 from actions.actions import Bump, escape_action, regenenerate_map, reveal_map, wait_action
 from actions.action_helpers import do_player_action
 from engine.state import State
@@ -41,10 +41,7 @@ class DefaultState(BaseState):
         return self
     
     def on_draw(self, console: Console) -> None:
-        (player,) = self.world.Q.all_of(tags=[IsPlayer])
-        render_map(console, self.world)
-        render_all_entities(console, self.world)
-        render_bar(console, player.components[HP], player.components[HPMax], HEALTH_BAR_WIDTH)
+        render_main(console, self.world)
 
 class GameOverState(BaseState):
     """The player has died - they cannot move and must restart or load a save."""
@@ -54,10 +51,7 @@ class GameOverState(BaseState):
         return self
         
     def on_draw(self, console: Console) -> None:
-        (player,) = self.world.Q.all_of(tags=[IsPlayer])
-        render_map(console, self.world)
-        render_all_entities(console, self.world)
-        render_bar(console, player.components[HP], player.components[HPMax], HEALTH_BAR_WIDTH)
+        render_main(console, self.world)
         
         frame_width = len("GAME OVER") + 2
         frame_height = 5

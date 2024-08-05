@@ -7,9 +7,11 @@ import tcod.ecs
 
 from constants.game_constants import *
 from constants.map_constants import *
-from constants.tags import IsPlayer, ActiveMap
+from constants.tags import ActiveMap
+from components.message_log import MessageLog
 from engine.game_globals import *
 from engine.actor_helpers import create_actor, update_fov
+from engine.messaging import add_message
 from engine.state import State
 from engine.states import DefaultState
 from dungeon.procgen import generate_caves
@@ -33,7 +35,6 @@ def main() -> None:
     rng.seed(seed)
     world[None].components["Random"] = rng
     player = create_actor((0, 0), prefabs.player, world)
-    # player.tags.add(IsPlayer)
 
     map_ = generate_caves(
         world,
@@ -44,7 +45,11 @@ def main() -> None:
         MAX_ROOMS,
     )
     world[None].relation_tag[ActiveMap] = map_
+
     game_state: State = DefaultState(world)
+
+    world[None].components[MessageLog] = MessageLog()
+
     update_fov(player)
 
     with tcod.context.new_terminal(
@@ -61,9 +66,11 @@ def main() -> None:
             game_state.on_draw(root_console)
             
             context.present(root_console)
-
             for event in tcod.event.wait():
-                game_state = game_state.on_event(event)
+                try:
+                    game_state = game_state.on_event(event)
+                except Exception as err:
+                    add_message(world, f"Unexpected {err=}, {type(err)=}", "RED")
                 
 
 
