@@ -38,7 +38,7 @@ class Move:
         return Success()
 
 class Melee:
-    def __init__(self, dx: int, dy: int):
+    def __init__(self, dx: int, dy: int) -> None:
         self.dx = dx
         self.dy = dy
 
@@ -63,7 +63,7 @@ class Melee:
         return Success()
 
 class Bump:
-    def __init__(self, dx: int, dy: int):
+    def __init__(self, dx: int, dy: int) -> None:
         self.dx = dx
         self.dy = dy
     
@@ -82,8 +82,8 @@ class Bump:
             return Move(self.dx, self.dy)(entity)
         
 class SimpleEnemy:
-    def __init__(self):
-        self.path: list[tuple[int, int]] = []
+    def __init__(self) -> None:
+        self.path: list[Position] = []
 
     def __call__(self, actor: tcod.ecs.Entity):
         (target,) = actor.registry.Q.all_of(tags=[IsPlayer])

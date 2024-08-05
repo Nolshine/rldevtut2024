@@ -4,15 +4,13 @@ from random import Random
 
 import tcod
 import tcod.ecs
-from typing import TYPE_CHECKING, Callable, Optional
 
-from components.components import Graphic
-import constants.colors as colors
 from constants.game_constants import *
 from constants.map_constants import *
 from constants.tags import IsPlayer, ActiveMap
 from engine.game_globals import *
 from engine.actor_helpers import create_actor, update_fov
+from engine.state import State
 from engine.states import DefaultState
 from dungeon.procgen import generate_caves
 import mobs.entity_prefabs as prefabs
@@ -46,7 +44,7 @@ def main() -> None:
         MAX_ROOMS,
     )
     world[None].relation_tag[ActiveMap] = map_
-    game_state = DefaultState(world)
+    game_state: State = DefaultState(world)
     update_fov(player)
 
     with tcod.context.new_terminal(
@@ -65,7 +63,7 @@ def main() -> None:
             context.present(root_console)
 
             for event in tcod.event.wait():
-                game_state.on_event(event)
+                game_state = game_state.on_event(event)
                 
 
 

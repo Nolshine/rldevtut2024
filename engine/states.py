@@ -1,43 +1,70 @@
 from typing import Protocol, Optional, Callable
 
+import tcod.event
 from tcod.console import Console
-from tcod.event import Event
 from tcod.ecs import Entity, Registry
+from tcod.event import KeySym
 
 
 from constants.tags import IsPlayer, ActiveMap
-from engine.input_handlers import DefaultHandler
+from constants.controls import MOVEMENT_KEYS, WAIT_KEYS
+import constants.colors as colors
 from engine.render_helpers import render_all_entities, render_map
-from actions.action import Action
+from actions.actions import Bump, escape_action, regenenerate_map, reveal_map, wait_action
 from actions.action_helpers import do_player_action
+from engine.state import State
 
 
 
-class State(Protocol):
-    __slots__ = ()
-
-    def on_event(self, event: Event) -> None:
-        pass
-    def on_draw(self, console: Console) -> None:
-        pass
-
-
-
-class DefaultState(State):
-    def __init__(self, world: Registry) -> None:
-        self.event_handler = DefaultHandler()
+class BaseState(State):
+    """Implements common initializer"""
+    def __init__(self, world: Registry):
         self.world = world
 
-    def on_event(self, event: Event) -> None:
+class DefaultState(BaseState):
+    """The default mode, wherein the player is exploring the dungeon."""
+    def on_event(self, event: tcod.event.Event) -> State:
         (player,) = self.world.Q.all_of(tags=[IsPlayer])
-        action: Action | None = self.event_handler.dispatch(event)
-
-        if action is None:
-            return
-        do_player_action(player, action)
+        match event:
+            case tcod.event.KeyDown(sym=sym) if sym in MOVEMENT_KEYS:
+                return do_player_action(self, player, Bump(*MOVEMENT_KEYS[sym]))
+            case tcod.event.KeyDown(sym=sym) if sym in WAIT_KEYS:
+                return do_player_action(self, player, wait_action)
+            case tcod.event.KeyDown(sym=KeySym.ESCAPE):
+                return do_player_action(self, player, escape_action)
+            case tcod.event.KeyDown(sym=KeySym.F1):
+                regenenerate_map(player)
+            case tcod.event.KeyDown(sym=KeySym.F2):
+                reveal_map(player)
+        return self
     
     def on_draw(self, console: Console) -> None:
-        (player,) = self.world.Q.all_of(tags=[IsPlayer])
-        map_ = self.world[None].relation_tag[ActiveMap]
-        render_map(console, map_)
-        render_all_entities(console, self.world, player)
+        render_map(console, self.world)
+        render_all_entities(console, self.world)
+
+class GameOverState(BaseState):
+    """The player has died - they cannot move and must restart or load a save."""
+    def on_event(self, event: tcod.event.Event) -> State:
+        if event.type == "KEYDOWN" and event.sym == KeySym.ESCAPE:
+            raise SystemExit()
+        return self
+        
+    def on_draw(self, console: Console) -> None:
+        render_map(console, self.world)
+        render_all_entities(console, self.world)
+
+        
+        frame_width = len("GAME OVER") + 2
+        frame_height = 5
+        frame_x = (console.width // 2) - frame_width // 2
+        frame_y = (console.height // 2) - 2
+        console.draw_frame(
+            x=frame_x,
+            y=frame_y,
+            width=frame_width,
+            height=frame_height,
+            title="Oh No",
+            fg=colors.WHITE,
+            bg=colors.BLACK,
+        )
+        console.print(frame_x + 1, frame_y + 2, "YOU DIED!", fg=colors.RED)

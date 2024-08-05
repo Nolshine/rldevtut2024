@@ -4,18 +4,27 @@ from typing import Callable
 
 import tcod.ecs
 
-from actions.action import Success, ActionResult
+import engine.states
+from engine.state import State
+from actions.action import Success, Failure, ActionResult
 from constants.tags import IsPlayer, IsActor, ActiveMap, InMap
-from components.components import Name, AI
+from components.components import HP, AI
 
 
-def do_player_action(player: tcod.ecs.Entity, action: Callable[[tcod.ecs.Entity], None]):
+def do_player_action(state: State, player: tcod.ecs.Entity, action: Callable[[tcod.ecs.Entity], Success | Failure]) -> State:
     assert IsPlayer in player.tags
+    world = player.registry
     result: ActionResult = action(player)
-    if isinstance(result, Success):
-         do_enemy_actions(player.registry)
-    else:
-         print(result.reason)
+
+    match result:
+         case Success():
+              do_enemy_actions(player.registry)
+         case Failure(reason=reason):
+              print(reason)
+    
+    if player.components[HP] <= 0:
+         return engine.states.GameOverState(world)
+    return state
 
 def do_enemy_actions(r: tcod.ecs.Registry):
         map_ = r[None].relation_tag[ActiveMap]
