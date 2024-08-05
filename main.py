@@ -37,8 +37,8 @@ def main() -> None:
 
     map_ = generate_caves(
         world,
-        SCREEN_W,
-        SCREEN_H,
+        MAP_WIDTH,
+        MAP_HEIGHT,
         ROOM_MAX_SIZE,
         ROOM_MIN_SIZE,
         MAX_ROOMS,

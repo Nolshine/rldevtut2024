@@ -7,7 +7,6 @@ import numpy as np
 import tcod.ecs
 
 from actions.action import Success, Failure, ActionResult
-from constants.game_constants import SCREEN_W, SCREEN_H
 from constants.map_constants import *
 from constants.tags import ActiveMap, IsActor, IsBlocking, IsPlayer, InMap
 from components.components import Name, Position, Tiles, VisibleTiles, ExploredTiles
@@ -121,8 +120,8 @@ def regenenerate_map(entity: tcod.ecs.Entity) -> ActionResult: # TODO: remove wh
     r[None].relation_tag[ActiveMap].clear()
     map_ = generate_caves(
         r,
-        SCREEN_W,
-        SCREEN_H,
+        MAP_WIDTH,
+        MAP_HEIGHT,
         ROOM_MAX_SIZE,
         ROOM_MIN_SIZE,
         MAX_ROOMS,

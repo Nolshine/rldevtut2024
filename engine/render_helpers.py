@@ -5,6 +5,7 @@ import tcod.console
 import tcod.ecs.registry
 import tcod.ecs.entity
 
+import constants.colors as colors
 from constants.tags import IsActor, IsPlayer, InMap, ActiveMap
 from constants.game_constants import SCREEN_W, SCREEN_H
 from components.components import Position, Graphic, MapShape, Tiles, VisibleTiles, ExploredTiles
@@ -45,3 +46,17 @@ def render_map(console: tcod.console.Console, world: tcod.ecs.Registry) -> None:
 
     console.rgb[:shape.width, :shape.height] = TILES["graphic"][np.where(visible, tiles, explored)]
     console.rgb["fg"][:shape.width, :shape.height][not_visible] //= 2
+
+def render_bar(
+        console: tcod.console.Console,
+        current_val: int,
+        max_val: int,
+        total_width: int,
+) -> None:
+    bar_width = int(float(current_val) / max_val * total_width)
+
+    console.draw_rect(x=0, y=45, width=total_width, height=1, ch=1, bg=colors.BAR_EMPTY)
+    if bar_width > 0:
+        console.draw_rect(x=0, y=45, width=bar_width, height=1, ch=1, bg=colors.BAR_FILLED)
+
+    console.print(x=1, y=45, string=f"HP: {current_val}/{max_val}", fg=colors.WHITE)
