@@ -11,7 +11,7 @@ import tcod.ecs
 import tcod.ecs.entity
 import tcod.ecs.registry
 
-from components.components import Tiles, VisibleTiles, ExploredTiles, Position, MapShape
+from components.main import Tiles, VisibleTiles, ExploredTiles, Position, MapShape
 from constants.map_constants import (
     CA_FIRST_PASSES,
     CA_SECOND_PASSES,

@@ -9,7 +9,7 @@ import tcod.ecs
 from actions.action import Success, Failure, ActionResult
 from constants.map_constants import *
 from constants.tags import ActiveMap, IsActor, IsBlocking, IsPlayer, InMap
-from components.components import Name, Position, Tiles, VisibleTiles, ExploredTiles
+from components.main import Name, Position, Tiles, VisibleTiles, ExploredTiles
 from dungeon.tiles import TILES
 from engine.actor_helpers import update_fov
 from engine.path_tools import path_to

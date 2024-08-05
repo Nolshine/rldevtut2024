@@ -5,7 +5,7 @@ from random import Random
 import tcod.ecs
 
 from constants.tags import IsPlayer, IsActor
-from components.components import AI, HP, Defense, Graphic, Name, PowerMin, PowerMax
+from components.main import AI, HP, Defense, Graphic, Name, PowerMin, PowerMax
 import constants.colors as colors
 
 

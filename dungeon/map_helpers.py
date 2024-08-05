@@ -10,7 +10,7 @@ import tcod
 import tcod.ecs
 
 import mobs.entity_prefabs as prefabs
-from components.components import Position, Tiles, AI
+from components.main import Position, Tiles, AI
 from constants.map_constants import MAX_MONSTERS_PER_ROOM
 from constants.tags import InMap, IsActor
 from dungeon.tiles import TileIndices

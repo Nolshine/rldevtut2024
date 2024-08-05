@@ -3,7 +3,7 @@ from __future__ import annotations
 import tcod.ecs
 import tcod.path
 
-from components.components import Position, Tiles
+from components.main import Position, Tiles
 from constants.game_constants import PATH_COST_INCREASE
 from constants.tags import IsActor, InMap
 from dungeon.tiles import TILES

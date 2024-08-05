@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Final
 
 import constants.colors as colors
-from components.components import Graphic
+from components.main import Graphic
 from constants.tags import IsActor, IsBlocking, IsPlayer
 
 
@@ -29,7 +29,7 @@ orc = EntityPrefab(
     name="Orc",
     graphic=Graphic("o", colors.ORC),
     hp_max=10,
-    power_min=3,
+    power_min=2,
     power_max=4,
     defense=0,
     tags=[IsActor, IsBlocking]
@@ -38,7 +38,7 @@ troll = EntityPrefab(
     name="Troll",
     graphic=Graphic("T", colors.TROLL),
     hp_max=16,
-    power_min=4,
+    power_min=3,
     power_max=6,
     defense=1,
     tags=[IsActor, IsBlocking]

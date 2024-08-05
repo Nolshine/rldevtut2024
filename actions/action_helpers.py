@@ -8,7 +8,7 @@ import engine.states
 from engine.state import State
 from actions.action import Success, Failure, ActionResult
 from constants.tags import IsPlayer, IsActor, ActiveMap, InMap
-from components.components import HP, AI
+from components.main import HP, AI
 
 
 def do_player_action(state: State, player: tcod.ecs.Entity, action: Callable[[tcod.ecs.Entity], Success | Failure]) -> State:

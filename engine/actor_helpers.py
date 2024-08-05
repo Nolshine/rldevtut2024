@@ -7,8 +7,8 @@ import tcod.ecs
 import tcod.ecs.entity
 import tcod.map
 
-from components.components import Graphic, Position, Name, HP, HPMax, PowerMin, PowerMax, Defense
-from components.components import Tiles, VisibleTiles, ExploredTiles
+from components.main import Graphic, Position, Name, HP, HPMax, PowerMin, PowerMax, Defense
+from components.main import Tiles, VisibleTiles, ExploredTiles
 from constants.tags import InMap, IsActor
 from constants.game_constants import PLAYER_FOV_RADIUS
 from dungeon.tiles import TILES

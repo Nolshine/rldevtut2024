@@ -8,7 +8,7 @@ import tcod.ecs.entity
 import constants.colors as colors
 from constants.tags import IsActor, IsPlayer, InMap, ActiveMap
 from constants.game_constants import SCREEN_W, SCREEN_H
-from components.components import Position, Graphic, MapShape, Tiles, VisibleTiles, ExploredTiles
+from components.main import Position, Graphic, MapShape, Tiles, VisibleTiles, ExploredTiles
 from dungeon.tiles import TILES
 
 
