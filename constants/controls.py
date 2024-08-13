@@ -26,3 +26,5 @@ WAIT_KEYS: Final = [
     tcod.event.KeySym.PERIOD,
     tcod.event.KeySym.KP_5,
 ]
+
+SELECT_KEYS: Final = "abcdefghijklmnopqrstuvwxyz"

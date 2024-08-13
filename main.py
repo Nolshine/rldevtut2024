@@ -6,7 +6,7 @@ from random import Random
 import tcod
 import tcod.ecs
 
-import mobs.entity_prefabs as prefabs
+from mobs.mob_prefabs import player as player_prefab
 from constants.game_constants import *
 from constants.map_constants import *
 from constants.tags import ActiveMap
@@ -35,7 +35,7 @@ def main() -> None:
     rng = Random()
     rng.seed(seed)
     world[None].components["Random"] = rng
-    player = create_actor((0, 0), prefabs.player, world)
+    player = create_actor((0, 0), player_prefab, world)
 
     map_ = generate_caves(
         world,

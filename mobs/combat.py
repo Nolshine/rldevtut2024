@@ -6,7 +6,7 @@ import tcod.ecs
 
 import constants.colors as colors
 from constants.tags import IsPlayer, IsActor
-from components.main import AI, HP, Defense, Graphic, Name, PowerMin, PowerMax
+from components.main import AI, HP, HPMax, Defense, Graphic, Name, PowerMin, PowerMax
 from engine.messaging import add_message
 
 
@@ -21,6 +21,19 @@ def apply_damage(entity: tcod.ecs.Entity, damage: int) -> None:
     entity.components[HP] -= damage
     if entity.components[HP] <= 0:
         die(entity)
+
+def heal(actor: tcod.ecs.Entity, heal_amt: int) -> int:
+    """Heal an entity.."""
+    assert actor.components.get(HP, None) is not None
+    hp = actor.components[HP]
+    max_hp = actor.components[HPMax]
+    if hp == max_hp:
+        return 0
+    new_hp = min(hp + heal_amt, max_hp)
+    healed = new_hp - hp
+    actor.components[HP] = new_hp
+    return healed
+        
 
 def die(entity: tcod.ecs.Entity) -> None:
     """Kill an entity."""

@@ -8,13 +8,17 @@ from numpy.typing import NDArray
 
 import tcod
 import tcod.ecs
+import tcod.ecs.entity
+import tcod.ecs.registry
 
-import mobs.entity_prefabs as prefabs
+import mobs.mob_prefabs as mob_prefabs
+import items.item_prefabs as item_prefabs
 from components.main import Position, Tiles, AI
-from constants.map_constants import MAX_MONSTERS_PER_ROOM
+from constants.map_constants import MAX_MONSTERS_PER_ROOM, MAX_ITEMS_PER_ROOM
 from constants.tags import InMap, IsActor
 from dungeon.tiles import TileIndices
 from engine.actor_helpers import create_actor
+from engine.item_helpers import create_item
 from actions.actions import SimpleEnemy
 
 class RectangularRoom:
@@ -72,22 +76,39 @@ def place_monsters_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom],
     rng: Random = world[None].components["Random"]
     map_tiles: NDArray[np.int8] = map_.components[Tiles]
     for i in range(len(rooms)):
-    # for i in range(1):
         if i == 0:
             # no monsters in the antechamber
             continue
         for j in range(MAX_MONSTERS_PER_ROOM):
-        # for i in range(1):
             entities = world.Q.all_of(tags=[IsActor], relations=[(InMap, map_)])
             x, y = rng.randint(rooms[i].x1 + 1, rooms[i].x2), rng.randint(rooms[i].y1 + 1, rooms[i].y2)
             if ((not map_tiles[x, y] == TileIndices.WALL) and
                 (not any(e.components[Position].raw == (x, y) for e in entities))):
                 new_actor: tcod.ecs.Entity
-                prefab: prefabs.EntityPrefab
+                prefab: mob_prefabs.MobPrefab
                 if rng.random() < 0.8:
-                    prefab = prefabs.orc
+                    prefab = mob_prefabs.orc
                 else:
-                    prefab = prefabs.troll
+                    prefab = mob_prefabs.troll
                 new_actor = create_actor((x, y), prefab, world)
                 new_actor.components[AI] = SimpleEnemy()
                 new_actor.relation_tag[InMap] = map_
+
+
+def place_items_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom], world: tcod.ecs.Registry):
+    rng: Random = world[None].components["Random"]
+    map_tiles: NDArray[np.int8] = map_.components[Tiles]
+    for i in range(len(rooms)):
+        if i == 0:
+            # no items in antechamber
+            continue
+        for j in range(MAX_ITEMS_PER_ROOM):
+            if rng.random() < 0.4:
+                continue
+            x, y = rng.randint(rooms[i].x1 + 1, rooms[i].x2), rng.randint(rooms[i].y1 + 1, rooms[i].y2)
+            if (not map_tiles[x, y] == TileIndices.WALL):
+                prefab = item_prefabs.health_potion
+                new_item = create_item((x, y), prefab, world)
+                new_item.relation_tag[InMap] = map_
+
+                

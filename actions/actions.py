@@ -5,16 +5,18 @@ from typing import Final
 
 import numpy as np
 import tcod.ecs
+import tcod.ecs.entity
 
 from actions.action import Success, Failure, ActionResult
 from constants.map_constants import *
-from constants.tags import ActiveMap, IsActor, IsBlocking, IsPlayer, InMap
-from components.main import Name, Position, Tiles, VisibleTiles, ExploredTiles
+from constants.tags import ActiveMap, IsActor, IsBlocking, IsPlayer, InMap, IsItem, InInventory, IsQuaffable
+from components.main import Name, Position, Inventory, Tiles, VisibleTiles, ExploredTiles
+from components.item_effects import Healing
 from dungeon.tiles import TILES
 from engine.actor_helpers import update_fov
 from engine.path_tools import path_to
 from engine.messaging import add_message
-from mobs.combat import melee_damage, apply_damage
+from mobs.combat import melee_damage, apply_damage, heal
 
 class Move:
     def __init__(self, dx: int, dy: int) -> None:
@@ -85,6 +87,61 @@ class Bump:
             return Melee(self.dx, self.dy)(entity)
         else:
             return Move(self.dx, self.dy)(entity)
+        
+class GetItem:
+    def __call__(self, entity: tcod.ecs.Entity) -> ActionResult:
+        map_ = entity.relation_tag[InMap]
+        r = entity.registry
+        at_position = entity.components[Position]
+        try:
+            item = list(r.Q.all_of(tags=[IsItem, at_position], relations=[(InMap, map_)]).get_entities())[0]
+        except IndexError as err:
+            # print(err)
+            return Failure("There is nothing there to get.")
+        inv: Inventory = entity.components[Inventory]
+        if not inv.size < inv.max_size:
+            return Failure("Your inventory is full. You need to (d)rop or (q)uaff an item first.")
+        del item.relation_tag[InMap]
+        item.relation_tag[InInventory] = entity
+        inv.size += 1
+        add_message(r, f"You pick up the {item.components.get(Name, "????")}. You now have {inv.size}/{inv.max_size} items.")
+        return Success()
+    
+class DropItem:
+    def __init__(self, item: tcod.ecs.Entity) -> None:
+        self.item = item
+
+    def __call__(self, actor: tcod.ecs.Entity) -> ActionResult:
+        item = self.item
+        assert item.relation_tag[InInventory] is actor
+        del item.relation_tag[InInventory]
+        inv = actor.components[Inventory]
+        inv.size -= 1
+        map_ = actor.relation_tag[InMap]
+        item.components[Position] = actor.components[Position]
+        item.relation_tag[InMap] = map_
+        add_message(actor.registry, f"You drop the {item.components.get(Name, "????")}. You now have {inv.size}/{inv.max_size} items.")
+        return Success()
+    
+
+class QuaffItem:
+    def __init__(self, item: tcod.ecs.Entity) -> None:
+        self.item = item
+
+    def __call__(self, actor: tcod.ecs.Entity) -> ActionResult:
+        item = self.item
+        assert (item.relation_tag[InInventory] is actor) and (IsQuaffable in item.tags)
+        assert IsPlayer in actor.tags
+        if item.components.get(Healing, None) is not None:
+            healed: int = heal(actor, item.components[Healing])
+            if healed == 0:
+                return Failure("Your health is already full.")
+            item.clear()
+            actor.components[Inventory].size -= 1
+            add_message(actor.registry, f"You heal for {healed} HP.", "CYAN")
+            return Success()
+
+        
         
 class SimpleEnemy:
     def __init__(self) -> None:

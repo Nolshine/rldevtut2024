@@ -35,6 +35,12 @@ class Graphic:
     char: str
     fg: tuple[int, int, int]
 
+@attrs.define
+class Inventory:
+    """Represent's the existence and size of an entity's inventory."""
+    size: int
+    max_size: int
+
 class MapShape:
     def __init__(self, width: int, height: int) -> None:
         self.width = width
