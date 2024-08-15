@@ -110,5 +110,3 @@ def place_items_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom], wo
                 prefab = item_prefabs.health_potion
                 new_item = create_item((x, y), prefab, world)
                 new_item.relation_tag[InMap] = map_
-
-                

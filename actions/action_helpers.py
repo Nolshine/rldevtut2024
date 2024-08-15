@@ -22,7 +22,7 @@ def do_player_action(state: State, player: tcod.ecs.Entity, action: Callable[[tc
               do_enemy_actions(player.registry)
          case Failure(reason=reason):
               add_message(world, reason, "GREY")
-    
+
     if player.components[HP] <= 0:
          return engine.states.GameOverState(world)
     return state

@@ -12,7 +12,7 @@ from dungeon.tiles import TILES
 
 def path_to(actor: tcod.ecs.Entity, dest: Position) -> list[Position]:
     """Compute and return a path from actor to destination.
-    
+
     If there is no valid path, return empty list."""
     map_ = actor.relation_tag[InMap]
 

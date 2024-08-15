@@ -73,7 +73,7 @@ class Bump:
     def __init__(self, dx: int, dy: int) -> None:
         self.dx = dx
         self.dy = dy
-    
+
     def __call__(self, entity: tcod.ecs.Entity) -> ActionResult:
         map_ = entity.relation_tag[InMap]
         r = entity.registry
@@ -87,7 +87,7 @@ class Bump:
             return Melee(self.dx, self.dy)(entity)
         else:
             return Move(self.dx, self.dy)(entity)
-        
+
 class GetItem:
     def __call__(self, entity: tcod.ecs.Entity) -> ActionResult:
         map_ = entity.relation_tag[InMap]
@@ -106,7 +106,7 @@ class GetItem:
         inv.size += 1
         add_message(r, f"You pick up the {item.components.get(Name, "????")}. You now have {inv.size}/{inv.max_size} items.")
         return Success()
-    
+
 class DropItem:
     def __init__(self, item: tcod.ecs.Entity) -> None:
         self.item = item
@@ -122,7 +122,7 @@ class DropItem:
         item.relation_tag[InMap] = map_
         add_message(actor.registry, f"You drop the {item.components.get(Name, "????")}. You now have {inv.size}/{inv.max_size} items.")
         return Success()
-    
+
 
 class QuaffItem:
     def __init__(self, item: tcod.ecs.Entity) -> None:
@@ -141,8 +141,8 @@ class QuaffItem:
             add_message(actor.registry, f"You heal for {healed} HP.", "CYAN")
             return Success()
 
-        
-        
+
+
 class SimpleEnemy:
     def __init__(self) -> None:
         self.path: list[Position] = []

@@ -80,7 +80,7 @@ def render_messages(
         height: int,
 ) -> tcod.console.Console:
     """Return a console with the message log rendered onto it..
-    
+
     Messages are rendered starting at the last entry and working back."""
     messages: Reversible[Message] = world[None].components[MessageLog]
     console = tcod.console.Console(width, height)

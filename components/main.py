@@ -24,11 +24,11 @@ class Position:
             return self.__class__(self.x + other[0], self.y + other[1])
         else: # Stops mypy from yelling :P
             return self.__class__(self.x + other.x, self.y + other.y)
-        
+
     @property
     def raw(self) -> tuple[int, int]:
         return (self.x, self.y)
-    
+
 @attrs.define(frozen=True)
 class Graphic:
     """An entity's visual representation."""
@@ -49,7 +49,7 @@ class MapShape:
     @property
     def raw(self) -> tuple[int, int]:
         return (self.width, self.height)
-    
+
 Name: Final = ("Name", str)
 """An entity's name."""
 HP: Final = ("HP", int)

@@ -70,9 +70,9 @@ def generate_dungeon(
             # All other rooms after the first
             for x, y in tunnel_between(world, rooms[-1].center, new_room.center):
                 map_tiles[x, y] = TileIndices.FLOOR
-        
+
         rooms.append(new_room)
-    
+
     return map_, rooms
 
 def generate_caves(
@@ -102,7 +102,7 @@ def generate_caves(
     # apply CA to grow cave walls
     for i in range(CA_FIRST_PASSES):
         map_tiles = cave_first_ca(map_tiles, shape)
-    
+
     for i in range(CA_SECOND_PASSES):
         map_tiles = cave_second_ca(map_tiles, shape)
 
@@ -144,7 +144,7 @@ def generate_caves(
                 good = False
         for x, y in tunnel_between(world, (x1, y1), (x2, y2)): # TODO: more organic tunneling function
             map_tiles[x, y] = TileIndices.FLOOR
-    
+
     map_.components[Tiles] = map_tiles
 
     place_monsters_in_rooms(map_, rooms, world)
@@ -171,7 +171,7 @@ def cave_second_ca(tiles_input: NDArray[np.int8], shape: MapShape) -> NDArray[np
 
 def check_neighbors(
         tiles: NDArray[np.int8],
-        point: tuple[int, int], 
+        point: tuple[int, int],
         shape: MapShape,
         tile_type: TileIndices,
         ignore_edges: bool,

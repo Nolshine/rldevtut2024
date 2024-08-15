@@ -59,7 +59,7 @@ class DefaultState(BaseState):
                     item.relation_tag[InInventory] = player
                 player.components[Inventory].size = 26
         return self
-    
+
     def on_draw(self, console: Console) -> None:
         render_main(console, self.world)
 
@@ -69,10 +69,10 @@ class GameOverState(BaseState):
         if event.type == "KEYDOWN" and event.sym == KeySym.ESCAPE:
             raise SystemExit()
         return self
-        
+
     def on_draw(self, console: Console) -> None:
         render_main(console, self.world)
-        
+
         frame_width = len("GAME OVER") + 2
         frame_height = 5
         frame_x = (console.width // 2) - frame_width // 2
@@ -115,7 +115,7 @@ class SelectItem(BaseState):
             on_select=lambda item: do_player_action(DefaultState(r), player, action(item)),
             on_cancel=DefaultState
         )
-        
+
     def on_event(self, event: tcod.event.Event) -> State:
         match event:
             case tcod.event.KeyDown(sym=sym) if sym in {ord(c) for c in SELECT_KEYS}:
@@ -126,7 +126,7 @@ class SelectItem(BaseState):
                 if self.on_cancel is not None:
                     return self.on_cancel(self.world)
         return self
-        
+
     def on_draw(self, console: Console) -> None:
         render_main(console, self.world)
 
@@ -152,4 +152,3 @@ class SelectItem(BaseState):
             y = 3 + (i % 13)
             x = 2 + (i // 13) * (ITEM_SELECT_FRAME_WIDTH // 2)
             console.print(frame_x + x, frame_y + y, f"({key_chr}) {item.components.get(Name, "????")}")
-

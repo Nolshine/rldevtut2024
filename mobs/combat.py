@@ -33,7 +33,7 @@ def heal(actor: tcod.ecs.Entity, heal_amt: int) -> int:
     healed = new_hp - hp
     actor.components[HP] = new_hp
     return healed
-        
+
 
 def die(entity: tcod.ecs.Entity) -> None:
     """Kill an entity."""

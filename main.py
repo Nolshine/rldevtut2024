@@ -61,11 +61,11 @@ def main() -> None:
         vsync=WINDOW_VSYNC,
         sdl_window_flags=FLAGS,
     ) as context:
-        
+
         while True:
             root_console.clear()
             game_state.on_draw(root_console)
-            
+
             context.present(root_console)
             for event in tcod.event.wait():
                 try:
@@ -73,7 +73,7 @@ def main() -> None:
                 except Exception as err:
                     traceback.print_exc()
                     add_message(world, f"{str(err)}", "RED")
-                
+
 
 
 if __name__ == "__main__":
