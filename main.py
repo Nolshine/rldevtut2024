@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import time
 import traceback
 from random import Random
@@ -20,11 +21,12 @@ from dungeon.procgen import generate_caves
 
 
 def main() -> None:
+    os.environ["SDL_RENDER_SCALE_QUALITY"] = "0"
     tileset: tcod.tileset.Tileset = tcod.tileset.load_tilesheet(
         FONT_PATH,
         FONT_COLS,
         FONT_ROWS,
-        tcod.tileset.CHARMAP_CP437,
+        TCOD_TILESET,
     )
     seed = int(time.time())
     print(f"Seed: {seed}")
@@ -63,9 +65,11 @@ def main() -> None:
 
         while True:
             root_console.clear()
+
             game_state.on_draw(root_console)
 
-            context.present(root_console)
+            context.present(root_console, keep_aspect=True, integer_scaling=True)
+
             for event in tcod.event.wait():
                 try:
                     game_state = game_state.on_event(event)

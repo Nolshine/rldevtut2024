@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from tcod.context import SDL_WINDOW_FULLSCREEN
+from tcod.tileset import CHARMAP_TCOD
 
 
 # main font
-FONT_PATH = "assets/terminal16x16_gs_ro.png"
-FONT_COLS = 16
-FONT_ROWS = 16
+FONT_PATH = "assets/solarmono32x8.png"
+FONT_COLS = 32
+FONT_ROWS = 8
+TCOD_TILESET = CHARMAP_TCOD
 
 # configuration
 FLAGS = SDL_WINDOW_FULLSCREEN
