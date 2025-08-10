@@ -34,11 +34,11 @@ class DefaultState(BaseState):
                 return do_player_action(self, player, Bump(*MOVEMENT_KEYS[sym]))
             case tcod.event.KeyDown(sym=sym) if sym in WAIT_KEYS:
                 return do_player_action(self, player, wait_action)
-            case tcod.event.KeyDown(sym=KeySym.g):
+            case tcod.event.KeyDown(sym=KeySym.G):
                 return do_player_action(self, player, GetItem())
-            case tcod.event.KeyDown(sym=KeySym.d):
+            case tcod.event.KeyDown(sym=KeySym.D):
                 return SelectItem.player_verb(player, "drop", DropItem, [IsItem])
-            case tcod.event.KeyDown(sym=KeySym.q):
+            case tcod.event.KeyDown(sym=KeySym.Q):
                 return SelectItem.player_verb(player, "quaff", QuaffItem, [IsItem, IsQuaffable])
             case tcod.event.KeyDown(sym=KeySym.ESCAPE):
                 return do_player_action(self, player, escape_action)
@@ -79,9 +79,9 @@ class GameOverState(BaseState):
         render_main(console, self.world)
 
         frame_width = len("GAME OVER") + 2
-        title_x = frame_width // 2
         frame_height = 5
         frame_x = (console.width // 2) - frame_width // 2
+        title_x = frame_x + 1
         frame_y = (console.height // 2) - 2
         console.draw_frame(
             x=frame_x,

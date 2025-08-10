@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from tcod.context import SDL_WINDOW_FULLSCREEN_DESKTOP
-
+from tcod.context import SDL_WINDOW_FULLSCREEN
 
 
 # main font
@@ -10,7 +9,7 @@ FONT_COLS = 16
 FONT_ROWS = 16
 
 # configuration
-FLAGS = SDL_WINDOW_FULLSCREEN_DESKTOP
+FLAGS = SDL_WINDOW_FULLSCREEN
 WINDOW_TITLE = "Yet Another Roguelike Tutorial"
 WINDOW_VSYNC = True
 SCREEN_WIDTH = 80

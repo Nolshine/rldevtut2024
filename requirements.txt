@@ -1,4 +1,4 @@
-tcod==18.1.0
+tcod>=19.0.0
 tcod-ecs>=5.2.2
 numpy>=1.18
 scipy>=1.14
