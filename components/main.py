@@ -22,11 +22,11 @@ class Position:
         """Return a new position, offset by 'other'."""
         if isinstance(other, tuple):
             return self.__class__(self.x + other[0], self.y + other[1])
-        else: # Stops mypy from yelling :P
+        else:
             return self.__class__(self.x + other.x, self.y + other.y)
 
     @property
-    def raw(self) -> tuple[int, int]:
+    def packed(self) -> tuple[int, int]:
         return (self.x, self.y)
 
 @attrs.define(frozen=True)

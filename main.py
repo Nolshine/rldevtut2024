@@ -4,7 +4,6 @@ import traceback
 from random import Random
 
 import tcod
-import tcod.ecs
 
 from mobs.mob_prefabs import player as player_prefab
 from constants.game_constants import *
@@ -29,12 +28,12 @@ def main() -> None:
     )
     seed = int(time.time())
     print(f"Seed: {seed}")
-    root_console = tcod.console.Console(SCREEN_W, SCREEN_H, order="F")
+    root_console = tcod.console.Console(SCREEN_WIDTH, SCREEN_HEIGHT, order="F")
 
     world = tcod.ecs.Registry()
     rng = Random()
     rng.seed(seed)
-    world[None].components["Random"] = rng
+    world[None].components[Random] = rng
     player = create_actor((0, 0), player_prefab, world)
 
     map_ = generate_caves(
@@ -53,9 +52,9 @@ def main() -> None:
 
     update_fov(player)
 
-    with tcod.context.new_terminal(
-        SCREEN_W,
-        SCREEN_H,
+    with tcod.context.new(
+        columns=SCREEN_WIDTH,
+        rows=SCREEN_HEIGHT,
         tileset=tileset,
         title=WINDOW_TITLE,
         vsync=WINDOW_VSYNC,

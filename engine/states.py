@@ -1,4 +1,4 @@
-from typing import Protocol, Optional, Callable, Self
+from typing import Callable, Self
 
 import tcod.event
 from tcod.console import Console
@@ -16,8 +16,8 @@ from engine.item_helpers import create_item
 from items.item_prefabs import health_potion
 from actions.action import Action
 from actions.actions import Bump, GetItem, DropItem, QuaffItem, escape_action, regenenerate_map, reveal_map, wait_action
-from actions.action_helpers import do_player_action
 from engine.state import State
+from actions.action_helpers import do_player_action
 
 
 class BaseState(State):
@@ -54,10 +54,12 @@ class DefaultState(BaseState):
                 # fill player inventory with health potions
                 for item in self.world.Q.all_of(tags=[IsItem], relations=[(InInventory, player)]):
                     item.clear()
-                for i in range(26):
+                for i in range(26): # type: ignore
                     item = create_item((0, 0), health_potion, self.world)
                     item.relation_tag[InInventory] = player
                 player.components[Inventory].size = 26
+            case _:
+                pass
         return self
 
     def on_draw(self, console: Console) -> None:
@@ -66,14 +68,18 @@ class DefaultState(BaseState):
 class GameOverState(BaseState):
     """The player has died - they cannot move and must restart or load a save."""
     def on_event(self, event: tcod.event.Event) -> State:
-        if event.type == "KEYDOWN" and event.sym == KeySym.ESCAPE:
-            raise SystemExit()
+        match event:
+            case tcod.event.KeyDown(sym=KeySym.ESCAPE):
+                raise SystemExit
+            case _:
+                pass
         return self
 
     def on_draw(self, console: Console) -> None:
         render_main(console, self.world)
 
         frame_width = len("GAME OVER") + 2
+        title_x = frame_width // 2
         frame_height = 5
         frame_x = (console.width // 2) - frame_width // 2
         frame_y = (console.height // 2) - 2
@@ -82,10 +88,10 @@ class GameOverState(BaseState):
             y=frame_y,
             width=frame_width,
             height=frame_height,
-            title="Oh No",
             fg=colors.WHITE,
             bg=colors.BLACK,
         )
+        console.print(x=title_x, y=frame_y, text="Oh no!", fg=colors.WHITE)
         console.print(frame_x + 1, frame_y + 2, "YOU DIED!", fg=colors.RED)
 
 class SelectItem(BaseState):
@@ -95,7 +101,7 @@ class SelectItem(BaseState):
             items: list[Entity],
             world: Registry,
             on_select: Callable[[Entity], State],
-            on_cancel: Callable[[], State] | None = None,
+            on_cancel: Callable[[Registry], State] | None = None,
             title: str = "Select an item:",
         ):
         super().__init__(world)
@@ -125,6 +131,8 @@ class SelectItem(BaseState):
             case tcod.event.KeyDown(sym=KeySym.ESCAPE):
                 if self.on_cancel is not None:
                     return self.on_cancel(self.world)
+            case _:
+                pass
         return self
 
     def on_draw(self, console: Console) -> None:
@@ -145,8 +153,8 @@ class SelectItem(BaseState):
         console.print(
             x=frame_x + 1,
             y=frame_y + 1,
-            string=self.title,
-            fg=colors.WHITE,
+            text=self.title,
+            fg=colors.WHITE
         )
         for i, (item, key_chr) in enumerate(zip(self.items, SELECT_KEYS)):
             y = 3 + (i % 13)

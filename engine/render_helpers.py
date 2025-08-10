@@ -4,12 +4,10 @@ from typing import Reversible
 
 import numpy as np
 import tcod.console
-import tcod.ecs.registry
-import tcod.ecs.entity
 
 import constants.colors as colors
 from constants.tags import IsActor, IsPlayer, InMap, ActiveMap
-from constants.game_constants import SCREEN_W, SCREEN_H
+from constants.game_constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from constants.gui_constants import HEALTH_BAR_WIDTH, MESSAGE_LOG_WIDTH, MESSAGE_LOG_HEIGHT
 from components.main import (
     Position,
@@ -28,26 +26,26 @@ from dungeon.tiles import TILES
 
 def render_all_entities(console: tcod.console.Console, world: tcod.ecs.Registry) -> None:
     (player,) = world.Q.all_of(tags=[IsPlayer])
-    actor_drawn = set()
+    actor_drawn: set[tuple[int, int]] = set()
     for entity in world.Q.all_of(components=[Position, Graphic], relations=[(InMap, world[None].relation_tag[ActiveMap])]):
         if IsPlayer in entity.tags:
             continue # Always draw player last
-        if entity.components[Position].raw in actor_drawn:
+        if entity.components[Position].packed in actor_drawn:
             continue # Do not draw over actor
         if IsActor in entity.tags:
-            actor_drawn.add(entity.components[Position].raw)
+            actor_drawn.add(entity.components[Position].packed)
         render_entity(console, entity)
     render_entity(console, player)
 
 def render_entity(console: tcod.console.Console, entity: tcod.ecs.Entity) -> None:
-    x, y = entity.components[Position].raw
-    if not (0 <= x < SCREEN_W and 0 <= y < SCREEN_H):
+    x, y = entity.components[Position].packed
+    if not (0 <= x < SCREEN_WIDTH and 0 <= y < SCREEN_HEIGHT):
         return
     visible = entity.relation_tag[InMap].components[VisibleTiles]
     if not visible[x, y]:
         return
     graphic = entity.components[Graphic]
-    console.print(x, y, graphic.char, graphic.fg)
+    console.print(x=x, y=y, text=graphic.char, fg=graphic.fg)
 
 def render_map(console: tcod.console.Console, world: tcod.ecs.Registry) -> None:
     map_ = world[None].relation_tag[ActiveMap]
@@ -71,8 +69,8 @@ def render_bar(
     console.draw_rect(x=0, y=45, width=total_width, height=1, ch=1, bg=colors.BAR_EMPTY)
     if bar_width > 0:
         console.draw_rect(x=0, y=45, width=bar_width, height=1, ch=1, bg=colors.BAR_FILLED)
-
-    console.print(x=1, y=45, string=f"HP: {current_val}/{max_val}", fg=colors.WHITE)
+    bar_str = f"HP: {current_val}/{max_val}"
+    console.print(x=1, y=45, text=bar_str, fg=colors.WHITE)
 
 def render_messages(
         world: tcod.ecs.Registry,
@@ -89,7 +87,7 @@ def render_messages(
 
     for message in reversed(messages):
         y -= tcod.console.get_height_rect(width, message.full_text)
-        console.print_box(x=0, y=y, width=width, height=height, string=message.full_text, fg=message.fg)
+        console.print(x=0, y=y, width=width, height=height, text=message.full_text, fg=message.fg)
         if y <= 0:
             break
     return console

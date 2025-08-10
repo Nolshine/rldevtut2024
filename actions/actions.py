@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import time
+from random import Random
 from typing import Final
 
 import numpy as np
 import tcod.ecs
-import tcod.ecs.entity
 
 from actions.action import Success, Failure, ActionResult
 from constants.map_constants import *
@@ -97,7 +97,7 @@ class GetItem:
             item = list(r.Q.all_of(tags=[IsItem, at_position], relations=[(InMap, map_)]).get_entities())[0]
         except IndexError as err:
             # print(err)
-            return Failure("There is nothing there to get.")
+            return Failure(f"{err}\nThere is nothing there to get.")
         inv: Inventory = entity.components[Inventory]
         if not inv.size < inv.max_size:
             return Failure("Your inventory is full. You need to (d)rop or (q)uaff an item first.")
@@ -141,6 +141,8 @@ class QuaffItem:
             add_message(actor.registry, f"You heal for {healed} HP.", "CYAN")
             return Success()
 
+        return Failure("Quaffing this wouldn't do anything. (Possibly a bug.)")
+
 
 
 class SimpleEnemy:
@@ -161,7 +163,7 @@ class SimpleEnemy:
         dx: Final = target_pos.x - actor_pos.x
         dy: Final = target_pos.y - actor_pos.y
         distance: Final = max(abs(dx), abs(dy)) # Chebyshev distance
-        if map_.components[VisibleTiles][actor_pos.raw]:
+        if map_.components[VisibleTiles][actor_pos.packed]:
             if distance <= 1:
                 return Melee(dx, dy)(actor)
             self.path = path_to(actor, target_pos)
@@ -179,7 +181,7 @@ def regenenerate_map(entity: tcod.ecs.Entity) -> ActionResult: # TODO: remove wh
     r = entity.registry
     new_seed = int(time.time())
     print(f"Seed: {new_seed}")
-    r[None].components["Random"].seed(new_seed)
+    r[None].components[Random].seed(new_seed)
     map(lambda e : e.clear(), r.Q.all_of(relations=[(InMap, ...)]).none_of(tags=[IsPlayer]))
     r[None].relation_tag[ActiveMap].clear()
     map_ = generate_caves(
@@ -195,7 +197,6 @@ def regenenerate_map(entity: tcod.ecs.Entity) -> ActionResult: # TODO: remove wh
     return Failure("DEBUG ACTION: regenerate map")
 
 def reveal_map(entity: tcod.ecs.Entity) -> ActionResult:
-    r = entity.registry
     map_ = entity.relation_tag[InMap]
     map_.components[ExploredTiles] = np.copy(map_.components[Tiles])
     return Failure("DEBUG ACTION: reveal map")

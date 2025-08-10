@@ -25,3 +25,4 @@ class Action(Protocol):
 
     def __call__(self, actor: tcod.ecs.Entity, /) -> ActionResult:
         """Perform action"""
+        ...

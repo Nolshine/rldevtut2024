@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Final
 
 import constants.colors as colors
 from components.main import Graphic

@@ -12,7 +12,7 @@ from engine.messaging import add_message
 
 def melee_damage(entity: tcod.ecs.Entity, target: tcod.ecs.Entity) -> int:
     """Get melee damage for attacking `target`."""
-    rng: Random = entity.registry[None].components["Random"]
+    rng: Random = entity.registry[None].components[Random]
     pre_damage = rng.randint(entity.components.get(PowerMin, 0), entity.components.get(PowerMax, 0))
     return max(0, pre_damage - target.components.get(Defense, 0))
 

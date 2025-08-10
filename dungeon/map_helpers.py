@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterator, TYPE_CHECKING
+from typing import Iterator
 from random import Random
 
 import numpy as np
@@ -8,8 +8,6 @@ from numpy.typing import NDArray
 
 import tcod
 import tcod.ecs
-import tcod.ecs.entity
-import tcod.ecs.registry
 
 import mobs.mob_prefabs as mob_prefabs
 import items.item_prefabs as item_prefabs
@@ -57,7 +55,7 @@ def tunnel_between(
         end: tuple[int, int],
 ) -> Iterator[tuple[int, int]]:
     """Return an L-shaped tunnel between these two points."""
-    rng: Random = world[None].components["Random"]
+    rng: Random = world[None].components[Random]
     x1, y1 = start
     x2, y2 = end
     if rng.random()  < 0.5:
@@ -73,17 +71,17 @@ def tunnel_between(
 
 
 def place_monsters_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom], world: tcod.ecs.Registry) -> None:
-    rng: Random = world[None].components["Random"]
+    rng: Random = world[None].components[Random]
     map_tiles: NDArray[np.int8] = map_.components[Tiles]
     for i in range(len(rooms)):
         if i == 0:
             # no monsters in the antechamber
             continue
-        for j in range(MAX_MONSTERS_PER_ROOM):
+        for j in range(MAX_MONSTERS_PER_ROOM): # type: ignore
             entities = world.Q.all_of(tags=[IsActor], relations=[(InMap, map_)])
             x, y = rng.randint(rooms[i].x1 + 1, rooms[i].x2), rng.randint(rooms[i].y1 + 1, rooms[i].y2)
             if ((not map_tiles[x, y] == TileIndices.WALL) and
-                (not any(e.components[Position].raw == (x, y) for e in entities))):
+                (not any(e.components[Position].packed == (x, y) for e in entities))):
                 new_actor: tcod.ecs.Entity
                 prefab: mob_prefabs.MobPrefab
                 if rng.random() < 0.8:
@@ -96,13 +94,13 @@ def place_monsters_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom],
 
 
 def place_items_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom], world: tcod.ecs.Registry):
-    rng: Random = world[None].components["Random"]
+    rng: Random = world[None].components[Random]
     map_tiles: NDArray[np.int8] = map_.components[Tiles]
     for i in range(len(rooms)):
         if i == 0:
             # no items in antechamber
             continue
-        for j in range(MAX_ITEMS_PER_ROOM):
+        for j in range(MAX_ITEMS_PER_ROOM): # type: ignore
             if rng.random() < 0.4:
                 continue
             x, y = rng.randint(rooms[i].x1 + 1, rooms[i].x2), rng.randint(rooms[i].y1 + 1, rooms[i].y2)

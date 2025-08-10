@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from itertools import pairwise
 from typing import List
+from random import Random
 
 import numpy as np
+# NOTE: missing stubs for scipy.ndimage not currently resolveable.
 import scipy.ndimage as ndi
 from numpy.typing import NDArray
 import tcod
 import tcod.ecs
-import tcod.ecs.entity
-import tcod.ecs.registry
 
 from components.main import Tiles, VisibleTiles, ExploredTiles, Position, MapShape
 from constants.map_constants import (
@@ -34,7 +34,7 @@ def generate_dungeon(
         room_min_size: int,
         max_rooms: int,
 ) -> tuple[tcod.ecs.Entity, list[RectangularRoom]]:
-    rng: random.Random = world[None].components["Random"]
+    rng: random.Random = world[None].components[Random]
     (player,) = world.Q.all_of(tags=[IsPlayer])
 
     map_ = world[object()]
@@ -47,7 +47,7 @@ def generate_dungeon(
 
     rooms: List[RectangularRoom] = []
 
-    for r in range(max_rooms):
+    for r in range(max_rooms): # type: ignore
         room_width = rng.randint(room_min_size, room_max_size)
         room_height = rng.randint(room_min_size, room_max_size)
 
@@ -84,7 +84,7 @@ def generate_caves(
         max_rooms: int,
 ) -> tcod.ecs.Entity:
     print("Generating caves...")
-    rng: random.Random = world[None].components["Random"]
+    rng: random.Random = world[None].components[Random]
     map_, rooms = generate_dungeon(world, map_width, map_height, room_max_size, room_min_size, max_rooms)
     shape = map_.components[MapShape]
     map_tiles = map_.components[Tiles]
@@ -100,10 +100,10 @@ def generate_caves(
     map_tiles = map_tiles2
 
     # apply CA to grow cave walls
-    for i in range(CA_FIRST_PASSES):
+    for i in range(CA_FIRST_PASSES): # type: ignore
         map_tiles = cave_first_ca(map_tiles, shape)
 
-    for i in range(CA_SECOND_PASSES):
+    for i in range(CA_SECOND_PASSES): # type: ignore
         map_tiles = cave_second_ca(map_tiles, shape)
 
     s = [
@@ -113,6 +113,7 @@ def generate_caves(
     ]
 
     # create a list of slices that represent unconnected regions
+    # NOTE: scipy.ndimage
     labelled, num_features = ndi.label(map_tiles, structure=s)
     regions: list[tuple[slice, slice, None]] = ndi.find_objects(labelled)
     isolated: list[tuple[slice, slice, None]] = []
@@ -142,7 +143,8 @@ def generate_caves(
             x2, y2 = rng.randint(r2[0].start, r2[0].stop - 1), rng.randint(r2[1].start, r2[1].stop - 1)
             if map_tiles[x1, y1] == TileIndices.WALL or map_tiles[x2, y2] == TileIndices.WALL:
                 good = False
-        for x, y in tunnel_between(world, (x1, y1), (x2, y2)): # TODO: more organic tunneling function
+        # NOTE: Potential bug here. Doesn't seem to cause any issues?
+        for x, y in tunnel_between(world, (x1, y1), (x2, y2)):
             map_tiles[x, y] = TileIndices.FLOOR
 
     map_.components[Tiles] = map_tiles

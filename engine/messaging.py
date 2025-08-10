@@ -10,7 +10,7 @@ def add_message(world: tcod.ecs.Registry, text: str, fg: str = "WHITE"):
     """Append a message to the message log, stacking if necessary."""
     assert hasattr(colors, fg), fg
     log: list[Message] = world[None].components[MessageLog]
-    if log and log[-1] == text:
+    if log and log[-1].text == text:
         log[-1].count += 1
         return
     log.append(Message(text, fg))
