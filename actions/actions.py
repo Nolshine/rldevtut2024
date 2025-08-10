@@ -95,9 +95,8 @@ class GetItem:
         at_position = entity.components[Position]
         try:
             item = list(r.Q.all_of(tags=[IsItem, at_position], relations=[(InMap, map_)]).get_entities())[0]
-        except IndexError as err:
-            # print(err)
-            return Failure(f"{err}\nThere is nothing there to get.")
+        except IndexError:
+            return Failure(f"There is nothing there to get.")
         inv: Inventory = entity.components[Inventory]
         if not inv.size < inv.max_size:
             return Failure("Your inventory is full. You need to (d)rop or (q)uaff an item first.")
