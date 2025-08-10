@@ -21,7 +21,6 @@ from dungeon.procgen import generate_caves
 
 
 def main() -> None:
-    os.environ["SDL_RENDER_SCALE_QUALITY"] = "0"
     tileset: tcod.tileset.Tileset = tcod.tileset.load_tilesheet(
         FONT_PATH,
         FONT_COLS,
