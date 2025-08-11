@@ -17,6 +17,7 @@ ORC = (52, 255, 20)
 TROLL = (120, 173, 255)
 
 # GUI-specific colours
+GUI_FRAME_FG = WHITE
 PLAYER_ATK = (224, 224, 224)
 ENEMY_ATK = (255, 192, 192)
 

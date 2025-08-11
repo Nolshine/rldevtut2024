@@ -6,8 +6,8 @@ ROOM_MIN_SIZE = 8
 MAX_ROOMS = 200
 MAX_MONSTERS_PER_ROOM = 2
 MAX_ITEMS_PER_ROOM = 2
-MAP_WIDTH = SCREEN_WIDTH
-MAP_HEIGHT = SCREEN_HEIGHT - 5
+MAP_WIDTH = SCREEN_WIDTH - 2 # bounded by 2 columns of frame
+MAP_HEIGHT = SCREEN_HEIGHT - 8 # status/message bar is 5 tall, and bounded by 2 rows of frame
 
 # rules for caves
 CA_FIRST_PASSES = 5 # number of times to apply first-wave CA rules

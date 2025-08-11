@@ -14,8 +14,8 @@ TCOD_TILESET = CHARMAP_TCOD
 FLAGS = SDL_WINDOW_FULLSCREEN
 WINDOW_TITLE = "Yet Another Roguelike Tutorial"
 WINDOW_VSYNC = True
-SCREEN_WIDTH = 80
-SCREEN_HEIGHT = 50
+SCREEN_WIDTH = 71
+SCREEN_HEIGHT = 40
 
 # player tuning - player stats that can not change go here
 PLAYER_FOV_RADIUS = 10
