@@ -11,8 +11,8 @@ DARK_RED = (127, 0, 0)
 GREY = (140, 140, 140)
 
 # complex colours
-DARK_FADED_BROWN = (82, 73, 70)
-DARK_GREY = (36, 36, 36)
+DARK_FADED_BROWN = (112, 93, 71)
+DARK_GREY = (75, 75, 75)
 ORC = (52, 255, 20)
 TROLL = (120, 173, 255)
 
