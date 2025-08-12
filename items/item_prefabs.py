@@ -1,6 +1,6 @@
 import attrs
 
-from components.main import Graphic
+from components.main import Graphic, Component, Healing
 from constants.tags import IsItem, IsQuaffable
 import constants.colors as colors
 
@@ -11,11 +11,13 @@ class ItemPrefab:
     name: str
     graphic: Graphic
     tags: list[str]
-    healing: int | None
+    components: list[Component]
 
-health_potion = ItemPrefab(
-    name="Health Potion",
+small_healing_potion = ItemPrefab(
+    name="Health Potion (s)",
     graphic=Graphic("!", colors.MAGENTA),
     tags=[IsItem, IsQuaffable],
-    healing=10,
+    components=[
+        Healing(amount=10),
+    ]
 )

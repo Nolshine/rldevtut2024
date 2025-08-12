@@ -89,7 +89,7 @@ def place_monsters_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom],
                 else:
                     prefab = mob_prefabs.troll
                 new_actor = create_actor((x, y), prefab, world)
-                new_actor.components[AI] = SimpleEnemy()
+                new_actor.components[AI] = AI(SimpleEnemy())
                 new_actor.relation_tag[InMap] = map_
 
 
@@ -105,6 +105,6 @@ def place_items_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom], wo
                 continue
             x, y = rng.randint(rooms[i].x1 + 1, rooms[i].x2), rng.randint(rooms[i].y1 + 1, rooms[i].y2)
             if (not map_tiles[x, y] == TileIndices.WALL):
-                prefab = item_prefabs.health_potion
+                prefab = item_prefabs.small_healing_potion
                 new_item = create_item((x, y), prefab, world)
                 new_item.relation_tag[InMap] = map_

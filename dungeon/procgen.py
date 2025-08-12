@@ -39,9 +39,9 @@ def generate_dungeon(
 
     map_ = world[object()]
     shape = MapShape(map_width, map_height)
-    map_.components[Tiles] = np.full(shape.raw, TileIndices.WALL, dtype=np.int8)
-    map_.components[VisibleTiles] = np.zeros(shape.raw, dtype=np.bool)
-    map_.components[ExploredTiles] = np.full(shape.raw, TileIndices.VOID, dtype=np.int8)
+    map_.components[Tiles] = np.full(shape.as_tuple, TileIndices.WALL, dtype=np.int8)
+    map_.components[VisibleTiles] = np.zeros(shape.as_tuple, dtype=np.bool)
+    map_.components[ExploredTiles] = np.full(shape.as_tuple, TileIndices.VOID, dtype=np.int8)
     map_.components[MapShape] = shape
     map_tiles = map_.components[Tiles]
 

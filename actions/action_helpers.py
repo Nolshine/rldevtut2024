@@ -22,7 +22,7 @@ def do_player_action(state: states.BaseState, player: tcod.ecs.Entity, action: C
          case Failure(reason=reason):
               add_message(world, reason, "GREY")
 
-    if player.components[HP] <= 0:
+    if player.components[HP].value <= 0:
          return states.GameOverState(world)
     return state
 
@@ -30,4 +30,4 @@ def do_enemy_actions(r: tcod.ecs.Registry):
         map_ = r[None].relation_tag[ActiveMap]
         npcs = r.Q.all_of(components=[AI], tags=[IsActor], relations=[(InMap, map_)]).none_of(tags=[IsPlayer])
         for entity in npcs:
-            entity.components[AI](entity)
+            entity.components[AI].action(entity)

@@ -13,7 +13,7 @@ from constants.gui_constants import ITEM_SELECT_FRAME_WIDTH, ITEM_SELECT_FRAME_H
 from components.main import Name, HP, HPMax, Inventory
 from engine.render_helpers import render_main
 from engine.item_helpers import create_item
-from items.item_prefabs import health_potion
+from items.item_prefabs import small_healing_potion
 from actions.action import Action
 from actions.actions import Bump, GetItem, DropItem, QuaffItem, escape_action, regenenerate_map, reveal_map, wait_action
 from engine.state import State
@@ -55,7 +55,7 @@ class DefaultState(BaseState):
                 for item in self.world.Q.all_of(tags=[IsItem], relations=[(InInventory, player)]):
                     item.clear()
                 for i in range(26): # type: ignore
-                    item = create_item((0, 0), health_potion, self.world)
+                    item = create_item((0, 0), small_healing_potion, self.world)
                     item.relation_tag[InInventory] = player
                 player.components[Inventory].size = 26
             case _:

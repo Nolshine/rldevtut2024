@@ -4,9 +4,10 @@ from typing import Reversible
 
 import numpy as np
 import tcod.console
+import tcod.ecs
 
 import constants.colors as colors
-from constants.tags import IsActor, IsPlayer, InMap, ActiveMap
+from constants.tags import IsActor, IsPlayer, IsItem, IsCorpse, InMap, ActiveMap
 from constants.game_constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from constants.gui_constants import (
     GUI_FRAME_DECORATION,
@@ -43,14 +44,15 @@ from dungeon.tiles import TILES
 
 def render_all_entities(console: tcod.console.Console, world: tcod.ecs.Registry) -> None:
     (player,) = world.Q.all_of(tags=[IsPlayer])
-    actor_drawn: set[tuple[int, int]] = set()
-    for entity in world.Q.all_of(components=[Position, Graphic], relations=[(InMap, world[None].relation_tag[ActiveMap])]):
-        if IsPlayer in entity.tags:
-            continue # Always draw player last
-        if entity.components[Position].packed in actor_drawn:
-            continue # Do not draw over actor
-        if IsActor in entity.tags:
-            actor_drawn.add(entity.components[Position].packed)
+    map_ = player.relation_tag[InMap]
+    actors = world.Q.all_of(tags=[IsActor], relations=[(InMap, map_)]).none_of(tags=[IsPlayer])
+    items = world.Q.all_of(tags=[IsItem], relations=[(InMap, map_)])
+    corpses = world.Q.all_of(tags=[IsCorpse], relations=[(InMap, map_)])
+    for entity in corpses:
+        render_entity(console, entity)
+    for entity in items:
+        render_entity(console, entity)
+    for entity in actors:
         render_entity(console, entity)
     render_entity(console, player)
 
@@ -206,8 +208,8 @@ def render_main(console: tcod.console.Console, world: tcod.ecs.Registry) -> None
         x=HEALTH_BAR_X,
         y=bar_y,
         console=console,
-        current_val=player.components[HP],
-        max_val=player.components[HPMax],
+        current_val=player.components[HP].value,
+        max_val=player.components[HPMax].value,
         total_width=HEALTH_BAR_WIDTH,
     )
     message_log_y = MESSAGE_SECTION_Y + 1

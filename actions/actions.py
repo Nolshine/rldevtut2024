@@ -10,8 +10,7 @@ import tcod.ecs
 from actions.action import Success, Failure, ActionResult
 from constants.map_constants import *
 from constants.tags import ActiveMap, IsActor, IsBlocking, IsPlayer, InMap, IsItem, InInventory, IsQuaffable
-from components.main import Name, Position, Inventory, Tiles, VisibleTiles, ExploredTiles
-from components.item_effects import Healing
+from components.main import Name, Position, Inventory, Tiles, VisibleTiles, ExploredTiles, Healing
 from dungeon.tiles import TILES
 from engine.actor_helpers import update_fov
 from engine.path_tools import path_to
@@ -99,7 +98,7 @@ class GetItem:
             return Failure(f"There is nothing there to get.")
         inv: Inventory = entity.components[Inventory]
         if not inv.size < inv.max_size:
-            return Failure("Your inventory is full. You need to (d)rop or (q)uaff an item first.")
+            return Failure("Your inventory is full. You need to use or drop an item first.")
         del item.relation_tag[InMap]
         item.relation_tag[InInventory] = entity
         inv.size += 1
@@ -131,8 +130,8 @@ class QuaffItem:
         item = self.item
         assert (item.relation_tag[InInventory] is actor) and (IsQuaffable in item.tags)
         assert IsPlayer in actor.tags
-        if item.components.get(Healing, None) is not None:
-            healed: int = heal(actor, item.components[Healing])
+        if item.components.get(Healing) is not None:
+            healed: int = heal(actor, item.components[Healing].amount)
             if healed == 0:
                 return Failure("Your health is already full.")
             item.clear()

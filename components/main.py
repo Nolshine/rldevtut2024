@@ -12,8 +12,30 @@ import tcod.ecs.callbacks
 from actions.action import Action
 
 
+
+class Component:
+    ...
+
+# map components
+@attrs.define
+class MapShape(Component):
+    width: int
+    height: int
+
+    @property
+    def as_tuple(self) -> tuple[int, int]:
+        return (self.width, self.height)
+
+Tiles: Final = ("Tiles", NDArray[np.int8])
+"""A map's tile composition."""
+VisibleTiles: Final = ("VisibleTiles", NDArray[np.bool])
+"""A player's currently visible tiles."""
+ExploredTiles: Final = ("ExploredTiles", NDArray[np.int8])
+"""A map's tiles that have already been seen."""
+
+# Entity/Actor components
 @attrs.define(frozen=True)
-class Position:
+class Position(Component):
     """An entity's position on a map."""
     x: int
     y: int
@@ -29,49 +51,6 @@ class Position:
     def packed(self) -> tuple[int, int]:
         return (self.x, self.y)
 
-@attrs.define(frozen=True)
-class Graphic:
-    """An entity's visual representation."""
-    char: str
-    fg: tuple[int, int, int]
-
-@attrs.define
-class Inventory:
-    """Represent's the existence and size of an entity's inventory."""
-    size: int
-    max_size: int
-
-class MapShape:
-    def __init__(self, width: int, height: int) -> None:
-        self.width = width
-        self.height = height
-
-    @property
-    def raw(self) -> tuple[int, int]:
-        return (self.width, self.height)
-
-Name: Final = ("Name", str)
-"""An entity's name."""
-HP: Final = ("HP", int)
-"""An actor's current hitpoints."""
-HPMax: Final = ("Max_HP", int)
-"""An actor's maximum hitpoints."""
-PowerMin: Final = ("PowerMin", int)
-"""An entity's minimum damage."""
-PowerMax: Final = ("PowerMax", int)
-"""An entity's maximum damage."""
-Defense: Final = ("Defense", int)
-"""An entity's armor value."""
-AI: Final = ("AI", Action)
-"""An actor's AI action."""
-
-Tiles: Final = ("Tiles", NDArray[np.int8])
-"""A map's tile composition."""
-VisibleTiles: Final = ("VisibleTiles", NDArray[np.bool])
-"""A player's currently visible tiles."""
-ExploredTiles: Final = ("ExploredTiles", NDArray[np.int8])
-"""A map's tiles that have already been seen."""
-
 @tcod.ecs.callbacks.register_component_changed(component=Position)
 def on_position_changed(e: tcod.ecs.Entity, old: Position | None, new: Position | None) -> None:
     if old == new:
@@ -80,3 +59,50 @@ def on_position_changed(e: tcod.ecs.Entity, old: Position | None, new: Position 
         e.tags.remove(old)
     if new is not None:
         e.tags.add(new)
+
+@attrs.define(frozen=True)
+class Graphic(Component):
+    """An entity's visual representation."""
+    char: str
+    fg: tuple[int, int, int]
+
+@attrs.define
+class Inventory(Component):
+    """Represent's the existence and size of an entity's inventory."""
+    size: int
+    max_size: int
+
+@attrs.define
+class HP(Component):
+    """An actor's current hitpoints."""
+    value: int
+
+@attrs.define
+class HPMax(Component):
+    """An actor's maximum hitpoints."""
+    value: int
+
+@attrs.define
+class Power(Component):
+    """An entity's minimum damage."""
+    min: int
+    max: int
+
+@attrs.define
+class Defense(Component):
+    """An entity's armor value."""
+    value: int
+
+@attrs.define
+class AI(Component):
+    """An actor's AI action."""
+    action: Action
+
+Name: Final = ("Name", str)
+
+# Effects (healing, poison, etc)
+
+@attrs.define
+class Healing(Component):
+    """A healing effect """
+    amount: int

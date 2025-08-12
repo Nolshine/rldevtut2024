@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 import constants.colors as colors
-from components.main import Graphic
+from components.main import Component, Graphic, HPMax, Power, Defense, Inventory
 from constants.tags import IsActor, IsBlocking, IsPlayer
 
 
@@ -10,37 +10,36 @@ class MobPrefab:
     name: str
     graphic: Graphic
     tags: list[str]
-    hp_max: int | None = None
-    power_min: int | None = None
-    power_max: int | None = None
-    defense: int | None = None
-    inventory: int | None = None
+    components: list[Component]
 
 player = MobPrefab(
     name="Player",
     graphic=Graphic("@", colors.WHITE),
-    hp_max=30,
-    power_min=3,
-    power_max=5,
-    defense=2,
-    inventory=26,
     tags=[IsPlayer, IsActor, IsBlocking],
+    components=[
+        HPMax(30),
+        Power(min=3, max=5),
+        Defense(2),
+        Inventory(0, 26),
+    ]
 )
 orc = MobPrefab(
     name="Orc",
     graphic=Graphic("o", colors.ORC),
-    hp_max=10,
-    power_min=2,
-    power_max=4,
-    defense=0,
     tags=[IsActor, IsBlocking],
+    components=[
+        HPMax(10),
+        Power(min=2, max=4),
+        Defense(0),
+    ]
 )
 troll = MobPrefab(
     name="Troll",
     graphic=Graphic("T", colors.TROLL),
-    hp_max=16,
-    power_min=3,
-    power_max=6,
-    defense=1,
     tags=[IsActor, IsBlocking],
+    components=[
+        HPMax(16),
+        Power(min=3,max=6),
+        Defense(1),
+    ]
 )
