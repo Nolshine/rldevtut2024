@@ -1,23 +1,16 @@
-import attrs
+import tcod.ecs
 
-from components.main import Graphic, Component, Healing
+from components.main import Graphic, Name, Healing
 from constants.tags import IsItem, IsQuaffable
 import constants.colors as colors
 
 
 
-@attrs.define(frozen=True)
-class ItemPrefab:
-    name: str
-    graphic: Graphic
-    tags: list[str]
-    components: list[Component]
-
-small_healing_potion = ItemPrefab(
-    name="Health Potion (s)",
-    graphic=Graphic("!", colors.MAGENTA),
-    tags=[IsItem, IsQuaffable],
-    components=[
-        Healing(amount=10),
-    ]
-)
+def register_items(world: tcod.ecs.Registry) -> None:
+    # consumables
+    item = world["health_potion"]
+    item.components[Name] = "Health Potion"
+    item.components[Graphic] = Graphic("!", colors.MAGENTA)
+    item.components[Healing] = 10
+    for tag in [IsItem, IsQuaffable]:
+        item.tags.add(tag)

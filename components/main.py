@@ -13,12 +13,9 @@ from actions.action import Action
 
 
 
-class Component:
-    ...
-
 # map components
 @attrs.define
-class MapShape(Component):
+class MapShape:
     width: int
     height: int
 
@@ -35,7 +32,7 @@ ExploredTiles: Final = ("ExploredTiles", NDArray[np.int8])
 
 # Entity/Actor components
 @attrs.define(frozen=True)
-class Position(Component):
+class Position:
     """An entity's position on a map."""
     x: int
     y: int
@@ -61,48 +58,32 @@ def on_position_changed(e: tcod.ecs.Entity, old: Position | None, new: Position 
         e.tags.add(new)
 
 @attrs.define(frozen=True)
-class Graphic(Component):
+class Graphic:
     """An entity's visual representation."""
     char: str
     fg: tuple[int, int, int]
 
 @attrs.define
-class Inventory(Component):
+class Inventory:
     """Represent's the existence and size of an entity's inventory."""
     size: int
     max_size: int
 
-@attrs.define
-class HP(Component):
-    """An actor's current hitpoints."""
-    value: int
+    @classmethod
+    def from_size(cls, max_size: int) -> "Inventory":
+        return cls(size=0, max_size=max_size)
 
 @attrs.define
-class HPMax(Component):
-    """An actor's maximum hitpoints."""
-    value: int
-
-@attrs.define
-class Power(Component):
+class Power:
     """An entity's minimum damage."""
     min: int
     max: int
 
-@attrs.define
-class Defense(Component):
-    """An entity's armor value."""
-    value: int
-
-@attrs.define
-class AI(Component):
-    """An actor's AI action."""
-    action: Action
-
+HP: Final = ("HP", int)
+HPMax: Final = ("HPMax", int)
+Defense: Final = ("Defense", int)
+AI: Final = ("AI", Action)
 Name: Final = ("Name", str)
 
 # Effects (healing, poison, etc)
-
-@attrs.define
-class Healing(Component):
-    """A healing effect """
-    amount: int
+Healing: Final = ("Healing", int)

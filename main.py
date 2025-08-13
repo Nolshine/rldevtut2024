@@ -5,17 +5,20 @@ from random import Random
 
 import tcod
 
-from mobs.mob_prefabs import player as player_prefab
+
 from constants.game_constants import *
 from constants.map_constants import *
-from constants.tags import ActiveMap
+from constants.tags import ActiveMap, IsPlayer
 from components.message_log import MessageLog
 from engine.game_globals import *
-from engine.actor_helpers import create_actor, update_fov
+from engine.entity_helpers import spawn
+from engine.actor_helpers import update_fov
 from engine.messaging import add_message
 from engine.state import State
 from engine.states import DefaultState
-from dungeon.procgen import generate_caves
+from dungeon.procgen import generate_caves, test_room
+from items.item_prefabs import register_items
+from mobs.mob_prefabs import register_mobs
 
 
 
@@ -27,6 +30,7 @@ def main() -> None:
         TCOD_TILESET,
     )
     seed = int(time.time())
+    # seed = 1755110659
     print(f"Seed: {seed}")
     root_console = tcod.console.Console(SCREEN_WIDTH, SCREEN_HEIGHT, order="F")
 
@@ -34,7 +38,11 @@ def main() -> None:
     rng = Random()
     rng.seed(seed)
     world[None].components[Random] = rng
-    player = create_actor((0, 0), player_prefab, world)
+    register_mobs(world)
+    register_items(world)
+
+    player = spawn("player", None, 0, 0, world)
+    player.tags.add(IsPlayer)
 
     map_ = generate_caves(
         world,
@@ -44,6 +52,7 @@ def main() -> None:
         ROOM_MIN_SIZE,
         MAX_ROOMS,
     )
+    # map_ = test_room(world)
     world[None].relation_tag[ActiveMap] = map_
 
     game_state: State = DefaultState(world)

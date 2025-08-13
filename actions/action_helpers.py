@@ -7,7 +7,7 @@ import tcod.ecs
 import engine.states as states
 from engine.messaging import add_message
 from actions.action import Success, Failure, ActionResult
-from constants.tags import IsPlayer, IsActor, ActiveMap, InMap
+from constants.tags import IsPlayer, IsActor, IsDead, ActiveMap, InMap
 from components.main import HP, AI
 
 
@@ -22,12 +22,12 @@ def do_player_action(state: states.BaseState, player: tcod.ecs.Entity, action: C
          case Failure(reason=reason):
               add_message(world, reason, "GREY")
 
-    if player.components[HP].value <= 0:
+    if player.components[HP] <= 0:
          return states.GameOverState(world)
     return state
 
 def do_enemy_actions(r: tcod.ecs.Registry):
         map_ = r[None].relation_tag[ActiveMap]
-        npcs = r.Q.all_of(components=[AI], tags=[IsActor], relations=[(InMap, map_)]).none_of(tags=[IsPlayer])
+        npcs = r.Q.all_of(components=[AI], tags=[IsActor], relations=[(InMap, map_)]).none_of(tags=[IsPlayer, IsDead])
         for entity in npcs:
-            entity.components[AI].action(entity)
+            entity.components[AI](entity)

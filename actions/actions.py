@@ -9,7 +9,7 @@ import tcod.ecs
 
 from actions.action import Success, Failure, ActionResult
 from constants.map_constants import *
-from constants.tags import ActiveMap, IsActor, IsBlocking, IsPlayer, InMap, IsItem, InInventory, IsQuaffable
+from constants.tags import ActiveMap, IsActor, IsBlocking, IsPlayer, IsDead, InMap, IsItem, InInventory, IsQuaffable
 from components.main import Name, Position, Inventory, Tiles, VisibleTiles, ExploredTiles, Healing
 from dungeon.tiles import TILES
 from engine.actor_helpers import update_fov
@@ -30,7 +30,7 @@ class Move:
         target = Position(pos.x + self.dx, pos.y + self.dy)
         if TILES[map_tiles[target.x, target.y]]["walk_cost"] == 0:
             return Failure("WARNING: Move action attempted into unwalkable tile.")
-        blocking = r.Q.all_of(tags=[IsActor, IsBlocking, target], relations=[(InMap, map_)]).get_entities()
+        blocking = r.Q.all_of(tags=[IsBlocking, target], relations=[(InMap, map_)]).none_of(tags=[IsDead]).get_entities()
         if len(blocking) > 0:
             return Failure("Something is blocking the way.")
         entity.components[Position] = target
@@ -81,7 +81,7 @@ class Bump:
         map_tiles = r[None].relation_tag[ActiveMap].components[Tiles]
         if TILES[map_tiles[target.x, target.y]]["walk_cost"] == 0:
             return Failure("You cannot move there.")
-        entities = r.Q.all_of(tags=[IsActor, IsBlocking, target], relations=[(InMap, map_)]).get_entities()
+        entities = r.Q.all_of(tags=[IsActor, IsBlocking, target], relations=[(InMap, map_)]).none_of(tags=[IsDead]).get_entities()
         if len(entities) > 0:
             return Melee(self.dx, self.dy)(entity)
         else:
@@ -131,7 +131,7 @@ class QuaffItem:
         assert (item.relation_tag[InInventory] is actor) and (IsQuaffable in item.tags)
         assert IsPlayer in actor.tags
         if item.components.get(Healing) is not None:
-            healed: int = heal(actor, item.components[Healing].amount)
+            healed: int = heal(actor, item.components[Healing])
             if healed == 0:
                 return Failure("Your health is already full.")
             item.clear()
@@ -167,7 +167,7 @@ class SimpleEnemy:
             self.path = path_to(actor, target_pos)
         if self.path:
             dest: Final = self.path.pop(0)
-            return Move(dest.x - actor_pos.x, dest.y - actor_pos.y)(actor)
+            return Bump(dest.x - actor_pos.x, dest.y - actor_pos.y)(actor)
         return wait_action(actor)
 
 

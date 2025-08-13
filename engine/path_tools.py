@@ -5,7 +5,7 @@ import tcod.path
 
 from components.main import Position, Tiles
 from constants.game_constants import PATH_COST_INCREASE
-from constants.tags import IsActor, InMap
+from constants.tags import IsActor, IsDead, InMap
 from dungeon.tiles import TILES
 
 
@@ -19,7 +19,7 @@ def path_to(actor: tcod.ecs.Entity, dest: Position) -> list[Position]:
     # Copy walkable array.
     cost = TILES["walk_cost"][map_.components[Tiles]]
 
-    for other in actor.registry.Q.all_of(tags=[IsActor], relations=[(InMap, map_)]):
+    for other in actor.registry.Q.all_of(tags=[IsActor], relations=[(InMap, map_)]).none_of(tags=[IsDead]):
         other_pos = other.components[Position]
         # check that an entity blocks movement and the cost isn't zero (blocking).:
         if cost[other_pos.packed]:

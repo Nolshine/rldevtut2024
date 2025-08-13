@@ -21,10 +21,33 @@ from constants.map_constants import (
 from constants.tags import IsPlayer, InMap
 from dungeon.map_helpers import RectangularRoom, place_monsters_in_rooms, place_items_in_rooms, tunnel_between
 from dungeon.tiles import TileIndices
+from engine.entity_helpers import spawn
 
 import random
 
 
+def test_room(
+        world: tcod.ecs.Registry
+) -> tcod.ecs.Entity:
+    map_ = world[object()]
+    shape = MapShape(20, 20)
+    map_.components[Tiles] = np.full(shape.as_tuple, TileIndices.WALL, dtype=np.int8)
+    map_.components[VisibleTiles] = np.zeros(shape.as_tuple, dtype=np.bool)
+    map_.components[ExploredTiles] = np.full(shape.as_tuple, TileIndices.VOID, dtype=np.int8)
+    map_.components[MapShape] = shape
+    map_room = RectangularRoom(0, 0, 20, 20)
+    map_.components[Tiles][map_room.inner] = TileIndices.FLOOR
+
+    (player,) = world.Q.all_of(tags=[IsPlayer])
+    player.relation_tag[InMap] = map_
+    player.components[Position] = Position(2, 10)
+
+    for n in range(3):
+        spawn("orc", map_, 18, 6 + (2*n), world)
+    for n in range(2):
+        spawn("troll", map_, 17, 5 + (2*n), world)
+
+    return map_
 
 def generate_dungeon(
         world: tcod.ecs.Registry,

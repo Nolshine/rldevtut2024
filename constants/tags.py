@@ -6,7 +6,7 @@ from typing import Final
 # Identity/categorisation tags
 IsPlayer: Final = "IsPlayer"
 IsActor: Final = "IsActor"
-IsCorpse: Final = "IsCorpse"
+IsDead: Final = "IsCorpse"
 IsBlocking: Final = "IsBlocking" # an entity that blocks movement
 IsItem: Final = "IsItem"
 IsQuaffable: Final = "IsQuaffable" # potions, draughts, cola, etc

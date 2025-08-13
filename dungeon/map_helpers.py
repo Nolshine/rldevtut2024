@@ -9,15 +9,12 @@ from numpy.typing import NDArray
 import tcod
 import tcod.ecs
 
-import mobs.mob_prefabs as mob_prefabs
-import items.item_prefabs as item_prefabs
+from actions.actions import SimpleEnemy
 from components.main import Position, Tiles, AI
 from constants.map_constants import MAX_MONSTERS_PER_ROOM, MAX_ITEMS_PER_ROOM
 from constants.tags import InMap, IsActor
 from dungeon.tiles import TileIndices
-from engine.actor_helpers import create_actor
-from engine.item_helpers import create_item
-from actions.actions import SimpleEnemy
+from engine.entity_helpers import spawn
 
 class RectangularRoom:
     """A rectangular room."""
@@ -37,7 +34,7 @@ class RectangularRoom:
 
     @property
     def inner(self) -> tuple[slice, slice]:
-        return slice(self.x1 + 1, self.x2), slice(self.y1 + 1, self.y2)
+        return slice(self.x1 + 1, self.x2 - 1), slice(self.y1 + 1, self.y2 - 1)
 
     def intersects(self, other: RectangularRoom) -> bool:
         """Return True if this room overlaps with another RectangularRoom."""
@@ -82,15 +79,12 @@ def place_monsters_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom],
             x, y = rng.randint(rooms[i].x1 + 1, rooms[i].x2), rng.randint(rooms[i].y1 + 1, rooms[i].y2)
             if ((not map_tiles[x, y] == TileIndices.WALL) and
                 (not any(e.components[Position].packed == (x, y) for e in entities))):
-                new_actor: tcod.ecs.Entity
-                prefab: mob_prefabs.MobPrefab
                 if rng.random() < 0.8:
-                    prefab = mob_prefabs.orc
+                    orc = spawn("orc", map_, x, y, world)
+                    orc.components[AI] = SimpleEnemy()
                 else:
-                    prefab = mob_prefabs.troll
-                new_actor = create_actor((x, y), prefab, world)
-                new_actor.components[AI] = AI(SimpleEnemy())
-                new_actor.relation_tag[InMap] = map_
+                    troll = spawn("troll", map_, x, y, world)
+                    troll.components[AI] = SimpleEnemy()
 
 
 def place_items_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom], world: tcod.ecs.Registry):
@@ -105,6 +99,4 @@ def place_items_in_rooms(map_: tcod.ecs.Entity, rooms: list[RectangularRoom], wo
                 continue
             x, y = rng.randint(rooms[i].x1 + 1, rooms[i].x2), rng.randint(rooms[i].y1 + 1, rooms[i].y2)
             if (not map_tiles[x, y] == TileIndices.WALL):
-                prefab = item_prefabs.small_healing_potion
-                new_item = create_item((x, y), prefab, world)
-                new_item.relation_tag[InMap] = map_
+                spawn("health_potion", map_, x, y, world)

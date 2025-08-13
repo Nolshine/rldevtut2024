@@ -4,26 +4,11 @@ import tcod.constants
 import tcod.ecs
 import tcod.map
 
-from components.main import Graphic, Position, Name, HP, HPMax
+from components.main import Position
 from components.main import Tiles, VisibleTiles, ExploredTiles
 from constants.tags import InMap
 from constants.game_constants import PLAYER_FOV_RADIUS
 from dungeon.tiles import TILES
-from mobs.mob_prefabs import MobPrefab
-
-def create_actor(pos: tuple[int, int], prefab: MobPrefab, world: tcod.ecs.Registry) -> tcod.ecs.Entity:
-    entity = world[object()]
-    entity.components[Name] = prefab.name
-    entity.components[Position] = Position(pos[0], pos[1])
-    entity.components[Graphic] = prefab.graphic
-    for tag in prefab.tags:
-        entity.tags.add(tag)
-    for component in prefab.components:
-        entity.components[type(component)] = component
-        if isinstance(component, HPMax):
-            entity.components[HP] = HP(component.value)
-
-    return entity
 
 def update_fov(entity: tcod.ecs.Entity) -> None:
     map_: tcod.ecs.Entity = entity.relation_tag[InMap]
