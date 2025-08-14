@@ -122,6 +122,20 @@ class DropItem:
         return Success()
 
 
+class ApplyHeal:
+    def __call__(self, actor: tcod.ecs.Entity, healing: Healing) -> ActionResult:
+        healed: int = heal(actor, healing.amount)
+        if healed == 0:
+            return Failure("Your health is already full.")
+        msg_prefix: str
+        if IsPlayer in actor.tags:
+            msg_prefix = "You heal"
+        else:
+            msg_prefix = f"{actor.components[Name]} heals"
+        add_message(actor.registry, f"{msg_prefix} for {healed} HP.", "CYAN")
+        return Success()
+
+
 class QuaffItem:
     def __init__(self, item: tcod.ecs.Entity) -> None:
         self.item = item
@@ -131,13 +145,12 @@ class QuaffItem:
         assert (item.relation_tag[InInventory] is actor) and (IsQuaffable in item.tags)
         assert IsPlayer in actor.tags
         if item.components.get(Healing) is not None:
-            healed: int = heal(actor, item.components[Healing].amount)
-            if healed == 0:
-                return Failure("Your health is already full.")
-            item.clear()
-            actor.components[Inventory].size -= 1
-            add_message(actor.registry, f"You heal for {healed} HP.", "CYAN")
-            return Success()
+            healing = item.components[Healing]
+            result =  ApplyHeal()(actor, healing)
+            if isinstance(result, Success):
+                item.clear()
+                actor.components[Inventory].size -= 1
+            return result
 
         return Failure("Quaffing this wouldn't do anything. (Possibly a bug.)")
 
