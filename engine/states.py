@@ -1,5 +1,6 @@
 from typing import Callable, Self
 
+import attrs
 import tcod.event
 from tcod.console import Console
 from tcod.ecs import Entity, Registry
@@ -20,11 +21,12 @@ from engine.state import State
 from actions.action_helpers import do_player_action
 
 
+@attrs.define
 class BaseState(State):
     """Implements common initializer"""
-    def __init__(self, world: Registry):
-        self.world = world
+    world: Registry
 
+@attrs.define
 class DefaultState(BaseState):
     """The default mode, wherein the player is exploring the dungeon."""
     def on_event(self, event: tcod.event.Event) -> State:
@@ -65,6 +67,7 @@ class DefaultState(BaseState):
     def on_draw(self, console: Console) -> None:
         render_main(console, self.world)
 
+@attrs.define
 class GameOverState(BaseState):
     """The player has died - they cannot move and must restart or load a save."""
     def on_event(self, event: tcod.event.Event) -> State:
@@ -94,21 +97,13 @@ class GameOverState(BaseState):
         console.print(x=title_x, y=frame_y, text="Oh no!", fg=colors.WHITE)
         console.print(frame_x + 1, frame_y + 2, "YOU DIED!", fg=colors.RED)
 
+@attrs.define(kw_only=True)
 class SelectItem(BaseState):
-    def __init__(
-            self,
-            *,
-            items: list[Entity],
-            world: Registry,
-            on_select: Callable[[Entity], State],
-            on_cancel: Callable[[Registry], State] | None = None,
-            title: str = "Select an item:",
-        ):
-        super().__init__(world)
-        self.items: list[Entity] = items
-        self.title: str = title
-        self.on_select: Callable[[Entity], State] = on_select
-        self.on_cancel: Callable[[Registry], State] | None = on_cancel
+    items: list[Entity]
+    world: Registry
+    on_select: Callable[[Entity], State]
+    on_cancel: Callable[[Registry], State] | None = None
+    title: str = "Select an item:"
 
     @classmethod
     def player_verb(cls, player: Entity, verb: str, action: Callable[[Entity], Action], tags: list[str]) -> Self:
