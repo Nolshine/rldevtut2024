@@ -4,13 +4,14 @@ import time
 from random import Random
 from typing import Final
 
+import attrs
 import numpy as np
 import tcod.ecs
 
 from actions.action import Success, Failure, ActionResult
 from constants.map_constants import *
 from constants.tags import ActiveMap, IsActor, IsBlocking, IsPlayer, InMap, IsItem, InInventory, IsQuaffable
-from components.main import Name, Position, Inventory, Tiles, VisibleTiles, ExploredTiles, Healing
+from components.main import Name, Position, Inventory, Tiles, VisibleTiles, ExploredTiles, Healing#, Damage
 from dungeon.tiles import TILES
 from engine.actor_helpers import update_fov
 from engine.path_tools import path_to
@@ -46,27 +47,36 @@ class Melee:
     def __call__(self, entity: tcod.ecs.Entity) -> ActionResult:
         r = entity.registry
         new_pos = entity.components[Position] + (self.dx, self.dy)
-        attacker_is_player = IsPlayer in entity.tags
         try:
             (target,) = entity.registry.Q.all_of(tags=[IsActor, new_pos])
         except ValueError:
-            return Failure("Nothing there to attack.")
-        defender_is_player = IsPlayer in entity.tags
+            return Failure(f"{entity.components[Name]} tried to attack but there is no target at ({new_pos.x}),{new_pos.y}.")
         dmg = melee_damage(entity, target)
+        attacker_is_player = IsPlayer in entity.tags
+        target_is_player = IsPlayer in target.tags
         attack_desc: str
         color_str: str
         if attacker_is_player:
             attack_desc = f"You hit the {target.components[Name]} for {dmg} HP!"
             color_str = "PLAYER_ATK"
-        elif defender_is_player:
+        elif target_is_player:
             attack_desc = f"The {entity.components[Name]} hits you for {dmg} HP!"
             color_str = "ENEMY_ATK"
         else:
             attack_desc = f"The {entity.components[Name]} hits the {target.components[Name]} for {dmg} HP!"
             color_str = "ENEMY_ATK"
         add_message(r, attack_desc, color_str)
-        apply_damage(target, dmg)
+        return ApplyDamage(target, dmg)(entity)
+
+@attrs.define
+class ApplyDamage:
+    target: tcod.ecs.Entity
+    amount: int
+
+    def __call__(self, entity: tcod.ecs.Entity) -> ActionResult:
+        apply_damage(self.target, self.amount)
         return Success()
+
 
 class Bump:
     def __init__(self, dx: int, dy: int) -> None:
@@ -154,6 +164,11 @@ class QuaffItem:
 
         return Failure("Quaffing this wouldn't do anything. (Possibly a bug.)")
 
+# @attrs.define
+# class UseItem:
+#     item: tcod.ecs.Entity
+#     needs_target: bool
+#     target: tcod.ecs.Entity | None
 
 
 class SimpleEnemy:
