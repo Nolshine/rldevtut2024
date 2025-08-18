@@ -106,3 +106,8 @@ Name: Final = ("Name", str)
 class Healing(Component):
     """A healing effect """
     amount: int
+
+@attrs.define
+class Damage(Component):
+    """A plain damaging effect"""
+    amount: int
