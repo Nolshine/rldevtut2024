@@ -10,6 +10,7 @@ IsCorpse: Final = "IsCorpse"
 IsBlocking: Final = "IsBlocking" # an entity that blocks movement
 IsItem: Final = "IsItem"
 IsQuaffable: Final = "IsQuaffable" # potions, draughts, cola, etc
+IsSpellScroll: Final = "IsSpellScroll" # all castable scrolls
 
 
 # Association/relational tags
