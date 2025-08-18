@@ -16,3 +16,6 @@ IsQuaffable: Final = "IsQuaffable" # potions, draughts, cola, etc
 ActiveMap: Final = "ActiveMap"
 InMap: Final = "InMap"
 InInventory: Final = "InInventory" # for entities that are associtead with an actor's inventory
+
+# Targeting tags
+NeedsTarget: Final = "NeedsTarget"
