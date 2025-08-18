@@ -4,14 +4,15 @@ from typing import Callable
 
 import tcod.ecs
 
+from engine.state import State
 import engine.states as states
 from engine.messaging import add_message
-from actions.action import Success, Failure, ActionResult
+from actions.action import ActionResult, Success, Failure
 from constants.tags import IsPlayer, IsActor, ActiveMap, InMap
 from components.main import HP, AI
 
 
-def do_player_action(state: states.BaseState, player: tcod.ecs.Entity, action: Callable[[tcod.ecs.Entity], Success | Failure]) -> states.BaseState:
+def do_player_action(state: State, player: tcod.ecs.Entity, action: Callable[[tcod.ecs.Entity], ActionResult]) -> State:
     assert IsPlayer in player.tags
     world = player.registry
     result: ActionResult = action(player)
