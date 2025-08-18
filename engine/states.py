@@ -51,7 +51,7 @@ class DefaultState(BaseState):
                 reveal_map(player)
             case tcod.event.KeyDown(sym=KeySym.F3):
                 # full heal player
-                player.components[HP] = player.components[HPMax]
+                player.components[HP].value = player.components[HPMax].value
             case tcod.event.KeyDown(sym=KeySym.F4):
                 # fill player inventory with health potions
                 for item in self.world.Q.all_of(tags=[IsItem], relations=[(InInventory, player)]):
