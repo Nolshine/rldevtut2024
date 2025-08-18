@@ -136,7 +136,8 @@ class ApplyHeal:
     def __call__(self, actor: tcod.ecs.Entity, healing: Healing) -> ActionResult:
         healed: int = heal(actor, healing.amount)
         if healed == 0:
-            return Failure("Your health is already full.")
+            return Failure("Your health is already full." if IsPlayer in actor.tags
+                           else f"{actor.components[Name]} was healed but already had full health.")
         msg_prefix: str
         if IsPlayer in actor.tags:
             msg_prefix = "You heal"
